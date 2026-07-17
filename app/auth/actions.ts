@@ -19,7 +19,7 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    redirect("/login?error=" + encodeURIComponent(error.message));
+    redirect("/auth/login?error=" + encodeURIComponent(error.message));
   }
 
   revalidatePath("/", "layout");
@@ -38,10 +38,10 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/register?error=" + encodeURIComponent(error.message));
+    redirect("/auth/register?error=" + encodeURIComponent(error.message));
   }
 
-  redirect("/login?message=Verifique seu email para confirmar o cadastro");
+  redirect("/auth/login?message=Verifique seu email para confirmar o cadastro");
 }
 
 export async function logout() {
