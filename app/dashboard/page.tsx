@@ -1,14 +1,14 @@
-import { cookies } from "next/headers";
-import { createClient } from "@/app/utils/supabase/server";
+"use client";
+
 import { logout } from "@/app/auth/actions";
+import { useUser } from "../hooks/useUser";
 
-export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+export default function DashboardPage() {
+  const { user, profile, loading } = useUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   return (
     <div>
@@ -17,7 +17,9 @@ export default async function DashboardPage() {
       <div className="mt-4">
         <p>Email: {user?.email}</p>
         <p>ID: {user?.id}</p>
-        <p>Criado em: {user?.created_at && new Date(user.created_at).toLocaleDateString("pt-BR")}</p>
+        <p>Created at: {user?.created_at && new Date(user.created_at).toLocaleDateString("pt-BR")}</p>
+        <p>Plan: {profile?.plan}</p>
+        {profile?.role === "admin" ? <div className="h-20 w-20 bg-red-500"></div> : null}
       </div>
 
       <form className="mt-4">
