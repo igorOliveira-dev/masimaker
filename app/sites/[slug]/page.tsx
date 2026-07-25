@@ -67,10 +67,6 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
     .eq("slug", slug)
     .single();
 
-  console.log("SLUG BUSCADO:", slug);
-  console.log("PAGE:", page);
-  console.log("PAGE ERROR:", pageError);
-
   if (pageError || !page) {
     notFound();
   }

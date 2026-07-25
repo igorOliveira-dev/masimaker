@@ -20,7 +20,7 @@ export default function CreateSectionForm({ onSubmit, onCancel }: CreateSectionF
     try {
       await onSubmit({ background, height });
     } catch {
-      setError("Não foi possível criar a seção. Tente novamente.");
+      setError("Could not create the section. Please try again.");
     } finally {
       setLoading(false);
     }

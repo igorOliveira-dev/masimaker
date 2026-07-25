@@ -55,7 +55,7 @@ export default function CreateComponentForm({ onSubmit, onCancel }: CreateCompon
     setError(null);
 
     if (!isValid()) {
-      setError("Preencha os campos obrigatórios.");
+      setError("Fill in the required fields.");
       return;
     }
 
@@ -63,7 +63,7 @@ export default function CreateComponentForm({ onSubmit, onCancel }: CreateCompon
     try {
       await onSubmit({ type, attributes: buildAttributes() });
     } catch {
-      setError("Não foi possível criar o componente. Tente novamente.");
+      setError("Unable to create the component. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -88,7 +88,7 @@ export default function CreateComponentForm({ onSubmit, onCancel }: CreateCompon
 
       {(type === "title" || type === "paragraph") && (
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Texto</label>
+          <label className="text-sm font-medium">Text</label>
           {type === "paragraph" ? (
             <textarea
               value={text}

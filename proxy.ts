@@ -6,9 +6,6 @@ const RESERVED_SUBDOMAINS = ["www", "app", "api"];
 
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
-  console.log("=== PROXY RODOU ===");
-  console.log("HOST:", host);
-  console.log("PATHNAME:", request.nextUrl.pathname);
 
   const hostname = host.split(":")[0]; // remove a porta (ex.: localhost:3000)
 

@@ -40,7 +40,7 @@ export default function MyPages() {
       .order("created_at", { ascending: false });
 
     if (fetchError) {
-      setError("Não foi possível carregar suas páginas.");
+      setError("Your pages could not be loaded.");
     } else {
       setPages(data ?? []);
     }
@@ -55,7 +55,7 @@ export default function MyPages() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        setError("Você precisa estar logado para ver suas páginas.");
+        setError("You need to be logged in to view your pages.");
         setLoading(false);
         return;
       }
@@ -77,7 +77,7 @@ export default function MyPages() {
     const { error: deleteError } = await supabase.from("pages").delete().eq("id", pageToDelete.id);
 
     if (deleteError) {
-      throw new Error("Erro ao deletar a página");
+      throw new Error("Error deleting the page");
     }
 
     // Atualiza a lista localmente sem precisar recarregar tudo do banco
@@ -164,7 +164,7 @@ export default function MyPages() {
         isOpen={!!pageToDelete}
         onClose={() => setPageToDelete(null)}
         onConfirm={handleDeletePage}
-        title="Deletar página"
+        title="Delete page"
         description={
           pageToDelete && (
             <>
@@ -172,7 +172,7 @@ export default function MyPages() {
             </>
           )
         }
-        confirmLabel="Deletar"
+        confirmLabel="Delete"
         danger
       />
     </div>

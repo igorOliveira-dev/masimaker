@@ -41,7 +41,7 @@ export async function signup(formData: FormData) {
     redirect("/auth/register?error=" + encodeURIComponent(error.message));
   }
 
-  redirect("/auth/login?message=Verifique seu email para confirmar o cadastro");
+  redirect("/auth/login?message=Check your email to confirm your registration.");
 }
 
 export async function logout() {
