@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 
 const roboto = Roboto({
-  weight: ["400", "700"], // especifica os pesos que quer
+  weight: ["400", "700"],
   variable: "--font-roboto",
   subsets: ["latin"],
 });
@@ -12,7 +12,7 @@ const roboto = Roboto({
 const pressStart2p = localFont({
   src: [
     {
-      path: "../public/fonts/PressStart2p.ttf",
+      path: "../public/fonts/PressStart2P.ttf",
       weight: "400",
       style: "normal",
     },
