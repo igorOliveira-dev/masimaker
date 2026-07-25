@@ -98,7 +98,7 @@ export default function EditorPage() {
       .order("position", { ascending: true });
 
     if (sectionsError) {
-      setError("Não foi possível carregar o conteúdo da página.");
+      setError("Unable to load the page content.");
       return;
     }
 
@@ -184,7 +184,7 @@ export default function EditorPage() {
     if (!sectionToDelete || !page) return;
 
     const { error: deleteError } = await supabase.from("sections").delete().eq("id", sectionToDelete.id);
-    if (deleteError) throw new Error("Erro ao deletar seção");
+    if (deleteError) throw new Error("Error deleting section.");
 
     await loadSections(page.id);
   }
@@ -193,17 +193,17 @@ export default function EditorPage() {
     if (!componentToDelete || !page) return;
 
     const { error: deleteError } = await supabase.from("components").delete().eq("id", componentToDelete.id);
-    if (deleteError) throw new Error("Erro ao deletar componente");
+    if (deleteError) throw new Error("Error deleting component");
 
     await loadSections(page.id);
   }
 
   if (loading) {
-    return <p className="text-sm opacity-80 text-center py-12">Carregando página...</p>;
+    return <p className="text-sm opacity-80 text-center py-12">Loading page...</p>;
   }
 
   if (error || !page) {
-    return <p className="text-sm text-red-600 text-center py-12">{error ?? "Página não encontrada."}</p>;
+    return <p className="text-sm text-red-600 text-center py-12">{error ?? "Page not found."}</p>;
   }
 
   return (
@@ -239,7 +239,7 @@ export default function EditorPage() {
                     <ActionsMenu
                       options={[
                         {
-                          label: "Excluir",
+                          label: "Delete",
                           icon: faTrash,
                           danger: true,
                           onClick: () => setComponentToDelete({ id: component.id, sectionId: section.id }),
@@ -267,7 +267,7 @@ export default function EditorPage() {
               <ActionsMenu
                 options={[
                   {
-                    label: "Excluir seção",
+                    label: "Delete section",
                     icon: faTrash,
                     danger: true,
                     onClick: () => setSectionToDelete(section),
@@ -298,9 +298,9 @@ export default function EditorPage() {
         isOpen={!!sectionToDelete}
         onClose={() => setSectionToDelete(null)}
         onConfirm={handleDeleteSection}
-        title="Excluir seção"
-        description="Tem certeza que deseja excluir essa seção? Todos os componentes dentro dela também serão apagados."
-        confirmLabel="Excluir"
+        title="Delete section"
+        description="Are you sure you want to delete this section? All components within it will also be deleted."
+        confirmLabel="Delete"
         danger
       />
 
@@ -308,9 +308,9 @@ export default function EditorPage() {
         isOpen={!!componentToDelete}
         onClose={() => setComponentToDelete(null)}
         onConfirm={handleDeleteComponent}
-        title="Excluir componente"
-        description="Tem certeza que deseja excluir esse componente?"
-        confirmLabel="Excluir"
+        title="Delete component"
+        description="Are you sure you want to delete this component?"
+        confirmLabel="Delete"
         danger
       />
     </div>

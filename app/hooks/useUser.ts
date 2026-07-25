@@ -38,7 +38,7 @@ export function useUser() {
       const { data: profileData, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
 
       if (error) {
-        console.error("Erro ao buscar profile:", error);
+        console.error("Error retrieving profile:", error);
       } else {
         setProfile(profileData);
       }

@@ -15,19 +15,19 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <label htmlFor="email">Email</label>
           <input id="email" name="email" type="email" required className="border p-2" />
 
-          <label htmlFor="password">Senha</label>
+          <label htmlFor="password">Password</label>
           <input id="password" name="password" type="password" required className="border p-2" />
 
           {params.message && <p className="text-green-600 text-sm mt-2">{params.message}</p>}
           {params.error && <p className="text-red-500 text-sm mt-2">{params.error}</p>}
 
-          <SubmitButton>Entrar</SubmitButton>
+          <SubmitButton>Sign in</SubmitButton>
         </form>
 
         <p className="mt-4 text-sm text-center">
-          Não tem conta?{" "}
+          New to Masi Maker?{" "}
           <Link href="/auth/register" className="text-blue-500 hover:underline">
-            Cadastre-se
+            Create an account
           </Link>
         </p>
       </AuthCard>

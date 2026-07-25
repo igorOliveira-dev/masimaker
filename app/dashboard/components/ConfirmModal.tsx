@@ -18,10 +18,10 @@ export default function ConfirmModal({
   isOpen,
   onClose,
   onConfirm,
-  title = "Confirmar ação",
+  title = "Confirm action",
   description,
-  confirmLabel = "Confirmar",
-  cancelLabel = "Cancelar",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   danger = false,
 }: ConfirmModalProps) {
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ export default function ConfirmModal({
       await onConfirm();
       onClose();
     } catch (err) {
-      setError("Não foi possível concluir a ação. Tente novamente.");
+      setError("The action could not be completed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export default function ConfirmModal({
               danger ? "bg-red-600" : "bg-[var(--purple)]"
             } hover:opacity-80 transition-opacity text-white rounded-md px-4 py-2 font-medium disabled:opacity-50`}
           >
-            {loading ? "Aguarde..." : confirmLabel}
+            {loading ? "Wait..." : confirmLabel}
           </button>
         </div>
       </div>

@@ -11,7 +11,7 @@ export function SubmitButton({ children }: { children: React.ReactNode }) {
       disabled={pending}
       className="bg-blue-500 text-white p-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      {pending ? "Carregando..." : children}
+      {pending ? "Loading..." : children}
     </button>
   );
 }

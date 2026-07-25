@@ -52,11 +52,11 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
     setError(null);
 
     if (!title.trim()) {
-      setError("Dê um título para sua página.");
+      setError("Give your page a title.");
       return;
     }
     if (!slug.trim()) {
-      setError("O slug não pode ficar vazio.");
+      setError("The slug cannot be empty.");
       return;
     }
 
@@ -74,9 +74,9 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
 
       if (insertError) {
         if (insertError.code === "23505") {
-          setError("Esse slug já está em uso. Tente outro.");
+          setError("This slug is already in use. Try another one.");
         } else {
-          setError("Não foi possível criar a página. Tente novamente.");
+          setError("Unable to create the page. Please try again.");
         }
         return;
       }
@@ -135,7 +135,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
             disabled={loading}
             className="cursor-pointer flex-1 bg-[var(--background-secondary)] hover:opacity-80 transition-opacity rounded-md px-4 py-2 font-medium disabled:opacity-50"
           >
-            Cancelar
+            Cancel
           </button>
         )}
         <button
@@ -143,7 +143,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
           disabled={loading}
           className="cursor-pointer flex-1 bg-[var(--purple)] hover:opacity-80 transition-opacity text-white rounded-md px-4 py-2 font-medium disabled:opacity-50"
         >
-          {loading ? "Criando..." : "Criar página"}
+          {loading ? "Creating..." : "Create page"}
         </button>
       </div>
     </form>
