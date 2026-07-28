@@ -34,7 +34,7 @@ const ComponentTree = () => {
           <p className="px-2 text-sm">Structure</p>
           <p className="text-xs text-[var(--foreground)]/40 px-2 py-3">No sections yet.</p>
           <button
-            onClick={addSection}
+            onClick={() => addSection()}
             className="cursor-pointer p-2 flex gap-2 items-center justify-center text-sm bg-[var(--foreground)]/10 mx-2 rounded hover:opacity-80 transition-opacity"
           >
             <Plus size={18} />
@@ -46,7 +46,7 @@ const ComponentTree = () => {
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm">Structure</p>
             <button
-              onClick={addSection}
+              onClick={() => addSection()}
               className="cursor-pointer flex px-2 py-0.5 gap-2 items-center justify-center text-sm bg-[var(--foreground)]/10 mx-2 rounded hover:opacity-80 transition-opacity"
             >
               + section
