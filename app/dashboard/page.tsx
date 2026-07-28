@@ -8,6 +8,7 @@ import ConfirmModal from "./components/ConfirmModal";
 import ActionsMenu from "./components/ActionsMenu";
 
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
 interface PageItem {
   id: string;
@@ -94,7 +95,7 @@ export default function MyPages() {
           disabled={!ownerId}
           className="cursor-pointer p-1 px-4 bg-[var(--purple)] border-2 rounded-lg  border-[var(--foreground)]/10 hover:opacity-80 transition-opacity"
         >
-          <span className="font-semibold">+ Create new page</span>
+          <span className="font-semibold text-white">+ Create new page</span>
         </button>
       </div>
 
@@ -111,7 +112,7 @@ export default function MyPages() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {pages.map((page) => (
-            <a
+            <Link
               key={page.id}
               href={`/dashboard/editor/${page.id}`}
               className="w-full border-2 border-[var(--foreground)]/10 rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
@@ -149,7 +150,7 @@ export default function MyPages() {
                   />
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       )}
