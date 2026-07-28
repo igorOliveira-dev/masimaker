@@ -47,7 +47,8 @@ interface EditorState {
   setPage: (page: PageData) => void;
   setSections: (sections: SectionItem[]) => void;
 
-  addSection: () => void;
+  addSection: (options?: { background?: string; height?: number }) => void; // na interface EditorState, adicione:
+  updateSection: (sectionId: string, patch: Partial<Omit<SectionItem, "id" | "components">>) => void;
   removeSection: (sectionId: string) => void;
   addComponent: (def: ComponentDefLike, sectionId: string) => void;
   removeComponent: (sectionId: string, componentId: string) => void;
@@ -113,6 +114,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
         selectedSectionId: newSection.id,
         selectedComponentId: null,
       });
+    },
+
+    updateSection: (sectionId, patch) => {
+      pushHistory();
+      set((state) => ({
+        sections: state.sections.map((s) => (s.id === sectionId ? { ...s, ...patch } : s)),
+        isDirty: true,
+      }));
     },
 
     removeSection: (sectionId) => {

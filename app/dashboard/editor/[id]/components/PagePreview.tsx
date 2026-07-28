@@ -1,34 +1,83 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { useRef } from "react";
 import { useEditorStore } from "@/app/stores/editorStore";
 import { componentRegistry } from "../blocks";
 
 const PagePreview = () => {
   const sections = useEditorStore((s) => s.sections);
+  const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
+  const selectSection = useEditorStore((s) => s.selectSection);
+  const updateSection = useEditorStore((s) => s.updateSection);
+
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  function handleResizeStart(e: React.MouseEvent, sectionId: string, startHeight: number) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const startY = e.clientY;
+    const el = sectionRefs.current[sectionId];
+
+    function handleMouseMove(moveEvent: MouseEvent) {
+      const delta = moveEvent.clientY - startY;
+      const newHeight = Math.max(40, startHeight + delta);
+      if (el) el.style.minHeight = `${newHeight}px`;
+    }
+
+    function handleMouseUp(upEvent: MouseEvent) {
+      const delta = upEvent.clientY - startY;
+      const newHeight = Math.max(40, startHeight + delta);
+      updateSection(sectionId, { height: newHeight });
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  }
 
   return (
     <div className="flex-1 h-full overflow-y-auto bg-[var(--background)] p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-      <div className="max-w-3xl mx-auto flex flex-col gap-4">
-        {sections.map((section) => (
-          <div
-            key={section.id}
-            className="w-full rounded-lg border-2 border-dashed border-[var(--foreground)]/10 p-4"
-            style={{
-              backgroundColor: section.background ?? undefined,
-              minHeight: section.height ?? 80,
-            }}
-          >
-            {section.components.length > 0
-              ? section.components.map((component) => {
-                  const def = componentRegistry[component.type as keyof typeof componentRegistry];
-                  if (!def) return null;
-                  const { Component } = def;
-                  return <Component key={component.id} component={component} />;
-                })
-              : null}
-          </div>
-        ))}
+      <div className="max-w-3xl flex flex-col gap-4">
+        {sections.map((section) => {
+          const isSelected = selectedSectionId === section.id;
+
+          return (
+            <div
+              key={section.id}
+              ref={(el) => {
+                sectionRefs.current[section.id] = el;
+              }}
+              onClick={() => selectSection(section.id)}
+              className={`w-full relative cursor-pointer transition-colors ${
+                isSelected
+                  ? "outline outline-2 outline-blue-500"
+                  : "hover:outline hover:outline-1 hover:outline-[var(--foreground)]/20"
+              }`}
+              style={{
+                backgroundColor: section.background ?? undefined,
+                minHeight: section.height ?? 80,
+              }}
+            >
+              {section.components.length > 0
+                ? section.components.map((component) => {
+                    const def = componentRegistry[component.type as keyof typeof componentRegistry];
+                    if (!def) return null;
+                    const { Component } = def;
+                    return <Component key={component.id} component={component} />;
+                  })
+                : null}
+
+              <div
+                onMouseDown={(e) => handleResizeStart(e, section.id, section.height ?? 80)}
+                className="absolute bottom-0 left-0 w-full h-2 cursor-row-resize flex items-center justify-center group"
+              >
+                <div className="w-16 h-1 rounded-full bg-[var(--foreground)]/20 group-hover:bg-[var(--foreground)]/40 transition-colors" />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

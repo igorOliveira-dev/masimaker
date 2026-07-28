@@ -89,7 +89,7 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
           key={section.id}
           style={{
             background: section.colors?.background ?? section.background ?? undefined,
-            minHeight: section.height ?? undefined,
+            minHeight: section.height ? `${section.height}px` : undefined,
           }}
           className="w-full px-4 py-12 flex flex-col gap-4 items-center"
         >
