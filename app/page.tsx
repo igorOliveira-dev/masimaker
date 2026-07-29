@@ -1,11 +1,10 @@
 "use client";
 
-import { Sun , Moon } from "lucide-react";
 // Landing page do MasiMaker
 // Nada de backend, login, dashboard, etc. apenas uma landing page simples com links para login e dashboard.
 // Porta de entrada do app, com informações sobre o que é o MasiMaker e como ele funciona.
 import Link from "next/link";
-import { useEffect, useState } from "react"; 
+import { ThemeToggleButton } from "./auth/components/ThemeToggleButton";
 
 const templates = [
   {
@@ -42,26 +41,6 @@ const structure = [
 ];
 
 export default function Home() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem("theme") as "light" | "dark" | null;
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const initialTheme = savedTheme ?? systemTheme;
-
-    setTheme(initialTheme);
-    document.documentElement.setAttribute("data-theme", initialTheme);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    window.localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
-  };
-
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
       <style>{`
@@ -81,13 +60,7 @@ to { opacity: 1; transform: translateY(0); }
           Masi Maker
         </span>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="rounded-lg border border-[var(--foreground)]/30 bg-[var(--background-secondary)] px-3 py-2 text-[11px] font-medium text-[var(--foreground)] [font-family:var(--font-press-start-2p)] transition-colors hover:bg-[var(--foreground)]/10"
-          >
-            {theme === "dark" ? <Sun /> : <Moon />}
-          </button>
+          <ThemeToggleButton />
           <Link
             href="/auth/login"
             className="bg-[var(--purple)] rounded-lg border border-[var(--purple)]/50 text-white text-[13px] font-medium [font-family:var(--font-press-start-2p)] px-3 py-2 transition-transform hover:bg-[var(--purple)]/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
