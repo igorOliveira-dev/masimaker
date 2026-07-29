@@ -9,35 +9,35 @@ import { useEffect, useState } from "react";
 
 const templates = [
   {
-    label: "Companhia aérea",
+    label: "Airline",
     tint: "bg-[var(--purple)]",
     tintSoft: "bg-[var(--purple)]/10",
   },
-  { label: "Clínica", tint: "bg-[#F2A93B]", tintSoft: "bg-[#F2A93B]/10" },
-  { label: "Portfólio", tint: "bg-[#6E9B72]", tintSoft: "bg-[#6E9B72]/10" },
+  { label: "Clinic", tint: "bg-[#F2A93B]", tintSoft: "bg-[#F2A93B]/10" },
+  { label: "Portfolio", tint: "bg-[#6E9B72]", tintSoft: "bg-[#6E9B72]/10" },
 ];
 
 const structure = [
   {
-    tag: "PÁGINA",
+    tag: "Page",
     dot: "bg-[var(--purple)]",
     text: "text-[var(--purple)]",
-    title: "Página ", 
-    desc: "O endereço final. Acessada em seu-nome.masimaker.com, reúne todas as seções que você montar.",
+    title: "Page ", 
+    desc: "The final link. Accessed at your-page-name.masimaker.com, it brings together all the sections you built.",
   },
   {
-    tag: "SEÇÃO",
+    tag: "Section",
     dot: "bg-[#F2A93B]",
     text: "text-[#F2A93B]",
-    title: "Seção",
-    desc: "Divide a página em blocos — apresentação, serviços, FAQ, contato — e organiza o que fica dentro dela.",
+    title: "Section",
+    desc: "Divide the page into blocks — introduction, services, FAQ, contact — and organize what goes inside them.",
   },
   {
-    tag: "COMPONENTE",
+    tag: "Component",
     dot: "bg-[#6E9B72]",
     text: "text-[#6E9B72]",
-    title: "Componente",
-    desc: "O elemento em si: título, parágrafo, imagem, carrossel, botão. Arrasta, solta, edita.",
+    title: "Component",
+    desc: "The element itself: title, paragraph, image, carousel, button. Drag, drop, edit.",
   },
 ];
 
@@ -92,7 +92,7 @@ to { opacity: 1; transform: translateY(0); }
             href="/auth/login"
             className="bg-[var(--purple)] rounded-lg border border-[var(--purple)]/50 text-white text-[13px] font-medium [font-family:var(--font-press-start-2p)] px-3 py-2 transition-transform hover:bg-[var(--purple)]/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
           >
-            Entrar
+            Log in
           </Link>
         </div>
       </header>
@@ -101,17 +101,17 @@ to { opacity: 1; transform: translateY(0); }
       <section className="mt-16 mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-8 md:grid-cols-2 md:items-center md:px-12 md:pt-16">
         <div>
           <span className="mm-block inline-block rounded-full border border-[var(--purple)]/50 bg-[var(--purple)]/90 px-3 py-1 text-xs text-white [font-family:var(--font-press-start-2p)] [animation-delay:0.04s]">
-            sua-pagina.masimaker.com
+            your-page-name.masimaker.com
           </span>
 
           <h1 className="mm-block mt-5 text-4xl font-bold leading-[1.05] tracking-tight [font-family:var(--font-press-start-2p)] md:text-5xl [var(--purple)]">
-            Sua página, montada em blocos.
+            Your page, built in blocks.
           </h1>
 
           <p className="mm-block mt-5 max-w-md text-base leading-relaxed [var(--foreground)] [animation-delay:0.08s] md:text-lg [font-family:var(--font-roboto)] font-semibold">
-            O Masi Maker é um editor visual para criar landing pages sem
-            escrever uma linha de código. Escolha um template, monte suas seções
-            e publique — tudo arrastando componentes prontos.
+            Masi Maker is a visual editor for creating landing pages without
+            writing a single line of code. Choose a template, build your sections,
+            and publish — all by dragging ready-made components.
           </p>
 
           <div className="mm-block mt-8 flex flex-wrap gap-3 [animation-delay:0.16s]">
@@ -119,13 +119,13 @@ to { opacity: 1; transform: translateY(0); }
               href="/auth/register"
               className="rounded-lg bg-[var(--purple)] px-5 py-3 font-semibold [font-family:var(--font-press-start-2p)] text-white transition-transform hover:-translate-y-0.5 hover:bg-[#71129f]/80  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
             >
-              Começar a criar
+              Start creating
             </Link>
             <Link
               href="/dashboard"
               className="rounded-lg border border-[var(--foreground)]/50 px-5 py-3 text-[var(--foreground)] font-semibold [font-family:var(--font-press-start-2p)] transition-colors hover:-translate-y-0.5 hover:bg-[var(--foreground)]/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#5B4FE8]"
             >
-              Já tenho conta
+              I already have an account
             </Link>
           </div>
         </div>
@@ -136,8 +136,8 @@ to { opacity: 1; transform: translateY(0); }
             <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
             <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-            <span className="ml-2 text-[11px] text-[#171717] [font-family:var(--font-press-start-2p)] text-">
-              clinica-vida.masimaker.com
+            <span className="ml-2 text-[11px] text-[#171717] [font-family:var(--font-press-start-2p)]">
+              life-clinic.masimaker.com
             </span>
           </div>
 
@@ -177,11 +177,11 @@ to { opacity: 1; transform: translateY(0); }
       {/* COMO FUNCIONA — hierarquia real do produto */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:px-12">
         <h2 className="text-2xl font-bold tracking-tight [font-family:var(--font-press-start-2p)] md:text-3xl">
-          Como funciona
+          How it works
         </h2>
         <p className="mt-2 max-w-lg text-[var(--foreground)] [font-family:var(--font-roboto)] font-semibold">
-          Três camadas simples, uma dentro da outra — como uma boneca russa de
-          blocos.
+          Three simple layers, one inside the other — like a Russian nesting doll
+          of blocks.
         </p>
 
         <div className="mt-8 rounded-2xl border border-[var(--foreground)]/10 p-2">
@@ -211,10 +211,10 @@ to { opacity: 1; transform: translateY(0); }
       {/* TEMPLATES */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:px-12">
         <h2 className="text-2xl font-bold tracking-tight [font-family:var(--font-press-start-2p)] md:text-3xl">
-          Comece de um template
+          Start from a template
         </h2>
         <p className="mt-2 max-w-lg text-[var(--foreground)] [font-family:var(--font-roboto)] font-semibold">
-          Estruturas prontas para os casos mais comuns — edite tudo depois.
+          Ready-made structures for the most common cases — edit everything later.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -239,10 +239,10 @@ to { opacity: 1; transform: translateY(0); }
         <div className="flex flex-col items-start gap-6 rounded-2xl bg-[var(--background-secondary)] px-6 py-10 md:flex-row md:items-center md:justify-between md:px-10">
           <div>
             <h2 className="text-1xl font-bold tracking-tight text-[var(--foreground)] [font-family:var(--font-press-start-2p)]">
-              Sua página pode estar no ar hoje.
+              Your page can be live today.
             </h2>
             <p className="mt-2 text-sm text-[var(--foreground)] [font-family:var(--font-roboto)] font-semibold">
-              Sem código, sem complicação — só montar e publicar.
+              No code, no hassle — just build and publish.
             </p>
           </div>
           <div className="flex shrink-0 gap-3">
@@ -250,13 +250,13 @@ to { opacity: 1; transform: translateY(0); }
               href="/dashboard"
               className=" h-12 rounded-lg bg-[var(--purple)] px-5 py-4 text-[10px] [font-family:var(--font-press-start-2p)] font-semibold text-white transition-transform hover:bg-[var(--purple)]/80 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              Criar minha página
+              Create my page
             </Link>
             <Link
               href="/auth/login"
               className="h-12 rounded-lg border border-[var(--foreground)]/30 px-5 py-4 text-[10px] font-semibold [font-family:var(--font-press-start-2p)] text-[var(--foreground)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white hover:bg-[var(--foreground)]/20 transition-transform hover:-translate-y-0.5"
             >
-              Entrar
+              Log in
             </Link>
           </div>
         </div>
