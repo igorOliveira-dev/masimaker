@@ -4,7 +4,6 @@ import { ChevronDown, ChevronRight, LayoutPanelTop, Plus } from "lucide-react";
 import { useState } from "react";
 import { useEditorStore } from "@/app/stores/editorStore";
 import { componentRegistry } from "../blocks";
-import NewSectionModal from "./UpdateSectionModal";
 import ActionsMenu from "../../../components/ActionsMenu";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import UpdateSectionModal from "./UpdateSectionModal";
