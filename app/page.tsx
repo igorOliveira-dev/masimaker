@@ -136,7 +136,7 @@ to { opacity: 1; transform: translateY(0); }
             <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
             <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-            <span className="ml-2 text-[11px] text-[var(--foreground)] [font-family:var(--font-press-start-2p)]">
+            <span className="ml-2 text-[11px] text-[#171717] [font-family:var(--font-press-start-2p)] text-">
               clinica-vida.masimaker.com
             </span>
           </div>
