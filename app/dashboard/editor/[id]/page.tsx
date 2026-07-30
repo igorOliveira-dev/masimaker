@@ -10,6 +10,7 @@ import Toolbar from "./components/Toolbar";
 import { useEditorStore } from "@/app/stores/editorStore";
 import type { ComponentItem } from "@/app/stores/editorStore";
 import PagePreview from "./components/PagePreview";
+import Inspector from "./components/Inspector";
 
 export default function EditorPage() {
   const params = useParams<{ id: string }>();
@@ -28,7 +29,9 @@ export default function EditorPage() {
   async function loadSections(pageId: string) {
     const { data: sectionsData, error: sectionsError } = await supabase
       .from("sections")
-      .select("id, background, colors, height, position, components (id, type, colors, attributes, position)")
+      .select(
+        "id, background, colors, height, position, components (id, type, colors, attributes, position)",
+      )
       .eq("page_id", pageId)
       .order("position", { ascending: true });
 
@@ -39,7 +42,9 @@ export default function EditorPage() {
 
     const sorted = (sectionsData ?? []).map((section: any) => ({
       ...section,
-      components: [...(section.components ?? [])].sort((a: ComponentItem, b: ComponentItem) => a.position - b.position),
+      components: [...(section.components ?? [])].sort(
+        (a: ComponentItem, b: ComponentItem) => a.position - b.position,
+      ),
     }));
 
     setSections(sorted);
@@ -72,11 +77,17 @@ export default function EditorPage() {
   }, [params?.id]);
 
   if (loading) {
-    return <p className="text-sm opacity-80 text-center py-12">Loading page...</p>;
+    return (
+      <p className="text-sm opacity-80 text-center py-12">Loading page...</p>
+    );
   }
 
   if (error || !page) {
-    return <p className="text-sm text-red-600 text-center py-12">{error ?? "Page not found."}</p>;
+    return (
+      <p className="text-sm text-red-600 text-center py-12">
+        {error ?? "Page not found."}
+      </p>
+    );
   }
 
   return (
@@ -85,6 +96,7 @@ export default function EditorPage() {
       <main className="h-[calc(100dvh-64px)] flex">
         <Toolbar />
         <PagePreview />
+        <Inspector />
       </main>
     </div>
   );
