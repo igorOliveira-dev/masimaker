@@ -48,11 +48,18 @@ interface EditorState {
   setSections: (sections: SectionItem[]) => void;
 
   addSection: (options?: { background?: string; height?: number }) => void; // na interface EditorState, adicione:
-  updateSection: (sectionId: string, patch: Partial<Omit<SectionItem, "id" | "components">>) => void;
+  updateSection: (
+    sectionId: string,
+    patch: Partial<Omit<SectionItem, "id" | "components">>,
+  ) => void;
   removeSection: (sectionId: string) => void;
   addComponent: (def: ComponentDefLike, sectionId: string) => void;
   removeComponent: (sectionId: string, componentId: string) => void;
-  updateComponent: (sectionId: string, componentId: string, patch: Partial<ComponentItem>) => void;
+  updateComponent: (
+    sectionId: string,
+    componentId: string,
+    patch: Partial<ComponentItem>,
+  ) => void;
 
   selectedSectionId: string | null;
   selectedComponentId: string | null;
@@ -85,15 +92,23 @@ export const useEditorStore = create<EditorState>((set, get) => {
     selectedSectionId: null,
     selectedComponentId: null,
 
-    selectSection: (id) => set({ selectedSectionId: id, selectedComponentId: null }),
+    selectSection: (id) =>
+      set({ selectedSectionId: id, selectedComponentId: null }),
 
-    selectComponent: (sectionId, componentId) => set({ selectedSectionId: sectionId, selectedComponentId: componentId }),
+    selectComponent: (sectionId, componentId) =>
+      set({ selectedSectionId: sectionId, selectedComponentId: componentId }),
 
     setPage: (page) => set({ page }),
 
     // usado só no load inicial — não entra no histórico nem marca "dirty"
     setSections: (sections) =>
-      set({ sections, savedSections: structuredClone(sections), history: [], future: [], isDirty: false }),
+      set({
+        sections,
+        savedSections: structuredClone(sections),
+        history: [],
+        future: [],
+        isDirty: false,
+      }),
 
     addSection: () => {
       const { sections, page } = get();
@@ -119,7 +134,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
     updateSection: (sectionId, patch) => {
       pushHistory();
       set((state) => ({
-        sections: state.sections.map((s) => (s.id === sectionId ? { ...s, ...patch } : s)),
+        sections: state.sections.map((s) =>
+          s.id === sectionId ? { ...s, ...patch } : s,
+        ),
         isDirty: true,
       }));
     },
@@ -127,7 +144,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
     removeSection: (sectionId) => {
       pushHistory();
       set((state) => ({
-        sections: state.sections.filter((s) => s.id !== sectionId).map((s, i) => ({ ...s, position: i })),
+        sections: state.sections
+          .filter((s) => s.id !== sectionId)
+          .map((s, i) => ({ ...s, position: i })),
         isDirty: true,
       }));
     },
@@ -160,26 +179,44 @@ export const useEditorStore = create<EditorState>((set, get) => {
       pushHistory();
       set((state) => ({
         sections: state.sections.map((s) =>
-          s.id === sectionId ? { ...s, components: s.components.filter((c) => c.id !== componentId) } : s,
-        ),
-        isDirty: true,
-      }));
-    },
-
-    updateComponent: (sectionId, componentId, patch) => {
-      pushHistory();
-      set((state) => ({
-        sections: state.sections.map((s) =>
           s.id === sectionId
             ? {
                 ...s,
-                components: s.components.map((c) => (c.id === componentId ? { ...c, ...patch } : c)),
+                components: s.components.filter((c) => c.id !== componentId),
               }
             : s,
         ),
         isDirty: true,
       }));
     },
+
+    updateComponent: (
+      sectionId,
+      componentId,
+      values: Partial<{
+        attributes: Record<string, any>;
+        colors: Record<string, any>;
+      }>,
+    ) =>
+      set((state) => ({
+        sections: state.sections.map((s) =>
+          s.id !== sectionId
+            ? s
+            : {
+                ...s,
+                components: s.components.map((c) =>
+                  c.id !== componentId
+                    ? c
+                    : {
+                        ...c,
+                        attributes: { ...c.attributes, ...values.attributes },
+                        colors: { ...c.colors, ...values.colors },
+                      },
+                ),
+              },
+        ),
+        isDirty: true,
+      })),
 
     undo: () => {
       const { history, sections, future } = get();
@@ -216,7 +253,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
         const newSectionIds = new Set(sections.map((s) => s.id));
 
         // 1. apagar sections removidas
-        const sectionsToDelete = savedSections.filter((s) => !newSectionIds.has(s.id));
+        const sectionsToDelete = savedSections.filter(
+          (s) => !newSectionIds.has(s.id),
+        );
         for (const s of sectionsToDelete) {
           await supabase.from("sections").delete().eq("id", s.id);
         }
@@ -259,7 +298,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
           const oldComponents = oldSection?.components ?? [];
           const newComponentIds = new Set(section.components.map((c) => c.id));
 
-          const componentsToDelete = oldComponents.filter((c) => !newComponentIds.has(c.id));
+          const componentsToDelete = oldComponents.filter(
+            (c) => !newComponentIds.has(c.id),
+          );
           for (const c of componentsToDelete) {
             await supabase.from("components").delete().eq("id", c.id);
           }
@@ -294,7 +335,11 @@ export const useEditorStore = create<EditorState>((set, get) => {
             }
           }
 
-          resolvedSections.push({ ...section, id: sectionId, components: resolvedComponents });
+          resolvedSections.push({
+            ...section,
+            id: sectionId,
+            components: resolvedComponents,
+          });
         }
 
         set({

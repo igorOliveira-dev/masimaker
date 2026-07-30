@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type RefObject, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
@@ -24,7 +31,10 @@ function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
   while (parent) {
     const style = getComputedStyle(parent);
     const overflowY = style.overflowY;
-    if ((overflowY === "auto" || overflowY === "scroll") && parent.scrollHeight > parent.clientHeight) {
+    if (
+      (overflowY === "auto" || overflowY === "scroll") &&
+      parent.scrollHeight > parent.clientHeight
+    ) {
       return parent;
     }
     parent = parent.parentElement;
@@ -32,7 +42,11 @@ function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
   return window;
 }
 
-function ActionsMenuPanel({ anchorRef, onClose, children }: ActionsMenuPanelProps) {
+function ActionsMenuPanel({
+  anchorRef,
+  onClose,
+  children,
+}: ActionsMenuPanelProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [ready, setReady] = useState(false);
@@ -59,10 +73,14 @@ function ActionsMenuPanel({ anchorRef, onClose, children }: ActionsMenuPanelProp
       } else {
         top = anchorRect.top - menuRect.height - gap;
       }
-      top = Math.min(Math.max(top, margin), viewportHeight - menuRect.height - margin);
+      top = Math.min(
+        Math.max(top, margin),
+        viewportHeight - menuRect.height - margin,
+      );
 
       const spaceRightAligned = anchorRect.right - menuRect.width;
-      const spaceLeftAligned = viewportWidth - (anchorRect.left + menuRect.width);
+      const spaceLeftAligned =
+        viewportWidth - (anchorRect.left + menuRect.width);
 
       let left: number;
       if (spaceRightAligned < margin && spaceLeftAligned >= margin) {
@@ -70,7 +88,10 @@ function ActionsMenuPanel({ anchorRef, onClose, children }: ActionsMenuPanelProp
       } else {
         left = anchorRect.right - menuRect.width;
       }
-      left = Math.min(Math.max(left, margin), viewportWidth - menuRect.width - margin);
+      left = Math.min(
+        Math.max(left, margin),
+        viewportWidth - menuRect.width - margin,
+      );
 
       setPos({ top, left });
       setReady(true);
@@ -85,12 +106,24 @@ function ActionsMenuPanel({ anchorRef, onClose, children }: ActionsMenuPanelProp
     const scrollParent = findScrollParent(anchorRef.current);
     const target: HTMLElement | Window = scrollParent;
 
-    const initialTop = scrollParent === window ? window.scrollY : (scrollParent as HTMLElement).scrollTop;
-    const initialLeft = scrollParent === window ? window.scrollX : (scrollParent as HTMLElement).scrollLeft;
+    const initialTop =
+      scrollParent === window
+        ? window.scrollY
+        : (scrollParent as HTMLElement).scrollTop;
+    const initialLeft =
+      scrollParent === window
+        ? window.scrollX
+        : (scrollParent as HTMLElement).scrollLeft;
 
     function handleScroll() {
-      const currentTop = scrollParent === window ? window.scrollY : (scrollParent as HTMLElement).scrollTop;
-      const currentLeft = scrollParent === window ? window.scrollX : (scrollParent as HTMLElement).scrollLeft;
+      const currentTop =
+        scrollParent === window
+          ? window.scrollY
+          : (scrollParent as HTMLElement).scrollTop;
+      const currentLeft =
+        scrollParent === window
+          ? window.scrollX
+          : (scrollParent as HTMLElement).scrollLeft;
 
       const dy = Math.abs(currentTop - initialTop);
       const dx = Math.abs(currentLeft - initialLeft);
@@ -150,7 +183,10 @@ interface ActionsMenuProps {
 
 //  Botão de 3 pontinhos que abre um menu de ações posicionado via portal,
 
-export default function ActionsMenu({ options, buttonClassName = "" }: ActionsMenuProps) {
+export default function ActionsMenu({
+  options,
+  buttonClassName = "",
+}: ActionsMenuProps) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -165,7 +201,7 @@ export default function ActionsMenu({ options, buttonClassName = "" }: ActionsMe
           setOpen((prev) => !prev);
         }}
         aria-label="Abrir opções"
-        className={`cursor-pointer w-8 h-8 flex items-center justify-center hover:bg-[var(--foreground)]/10 rounded-full transition-colors ${buttonClassName}`}
+        className={`cursor-pointer w-6 h-6 flex items-center justify-center hover:bg-[var(--foreground)]/10 rounded-full transition-colors ${buttonClassName}`}
       >
         <FontAwesomeIcon icon={faEllipsisVertical} className="w-2 h-2" />
       </button>

@@ -12,12 +12,12 @@ const PagePreview = () => {
 
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  function handleResizeStart(e: React.MouseEvent, sectionId: string, startHeight: number) {
-    e.stopPropagation();
-    e.preventDefault();
+  function handleResizeStart(e: React.MouseEvent, sectionId: string) {
+    const el = sectionRefs.current[sectionId];
+    if (!el) return;
 
     const startY = e.clientY;
-    const el = sectionRefs.current[sectionId];
+    const startHeight = el.offsetHeight;
 
     function handleMouseMove(moveEvent: MouseEvent) {
       const delta = moveEvent.clientY - startY;
@@ -39,7 +39,7 @@ const PagePreview = () => {
 
   return (
     <div className="flex-1 h-full overflow-y-auto bg-[var(--background)] p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-      <div className="max-w-3xl flex flex-col gap-4">
+      <div className="max-w-3xl flex flex-col">
         {sections.map((section) => {
           const isSelected = selectedSectionId === section.id;
 
@@ -52,25 +52,30 @@ const PagePreview = () => {
               onClick={() => selectSection(section.id)}
               className={`w-full relative cursor-pointer transition-colors ${
                 isSelected
-                  ? "outline outline-2 outline-blue-500"
+                  ? "outline outline-2 outline-blue-500 z-1"
                   : "hover:outline hover:outline-1 hover:outline-[var(--foreground)]/20"
               }`}
               style={{
                 backgroundColor: section.background ?? undefined,
-                minHeight: section.height ?? 80,
+                minHeight: `${section.height}px`,
               }}
             >
               {section.components.length > 0
                 ? section.components.map((component) => {
-                    const def = componentRegistry[component.type as keyof typeof componentRegistry];
+                    const def =
+                      componentRegistry[
+                        component.type as keyof typeof componentRegistry
+                      ];
                     if (!def) return null;
                     const { Component } = def;
-                    return <Component key={component.id} component={component} />;
+                    return (
+                      <Component key={component.id} component={component} />
+                    );
                   })
                 : null}
 
               <div
-                onMouseDown={(e) => handleResizeStart(e, section.id, section.height ?? 80)}
+                onMouseDown={(e) => handleResizeStart(e, section.id)}
                 className="absolute bottom-0 left-0 w-full h-2 cursor-row-resize flex items-center justify-center group"
               >
                 <div className="w-16 h-1 rounded-full bg-[var(--foreground)]/20 group-hover:bg-[var(--foreground)]/40 transition-colors" />

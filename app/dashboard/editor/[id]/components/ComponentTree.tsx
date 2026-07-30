@@ -6,7 +6,6 @@ import { useEditorStore } from "@/app/stores/editorStore";
 import { componentRegistry } from "../blocks";
 import ActionsMenu from "../../../components/ActionsMenu";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-import UpdateSectionModal from "./UpdateSectionModal";
 
 const ComponentTree = () => {
   const sections = useEditorStore((s) => s.sections);
@@ -20,7 +19,6 @@ const ComponentTree = () => {
   const removeComponent = useEditorStore((s) => s.removeComponent);
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
 
   function toggleCollapse(sectionId: string) {
     setCollapsed((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
@@ -31,7 +29,9 @@ const ComponentTree = () => {
       {sections.length === 0 ? (
         <div className="flex flex-col">
           <p className="px-2 text-sm">Structure</p>
-          <p className="text-xs text-[var(--foreground)]/40 px-2 py-3">No sections yet.</p>
+          <p className="text-xs text-[var(--foreground)]/40 px-2 py-3">
+            No sections yet.
+          </p>
           <button
             onClick={() => addSection()}
             className="cursor-pointer p-2 flex gap-2 items-center justify-center text-sm bg-[var(--foreground)]/10 mx-2 rounded hover:opacity-80 transition-opacity"
@@ -53,13 +53,16 @@ const ComponentTree = () => {
           </div>
           {sections.map((section, sectionIndex) => {
             const isOpen = !collapsed[section.id];
-            const isSectionSelected = selectedSectionId === section.id && !selectedComponentId;
+            const isSectionSelected =
+              selectedSectionId === section.id && !selectedComponentId;
 
             return (
               <div key={section.id} className="flex flex-col">
                 <div
                   className={`group flex items-center gap-1 h-8 px-1 rounded cursor-pointer transition-colors ${
-                    isSectionSelected ? "bg-[var(--foreground)]/15" : "hover:bg-[var(--foreground)]/10"
+                    isSectionSelected
+                      ? "bg-[var(--foreground)]/15"
+                      : "hover:bg-[var(--foreground)]/10"
                   }`}
                   onClick={() => selectSection(section.id)}
                 >
@@ -70,12 +73,18 @@ const ComponentTree = () => {
                     }}
                     className="cursor-pointer flex items-center justify-center w-4 h-4 shrink-0"
                   >
-                    {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    {isOpen ? (
+                      <ChevronDown size={14} />
+                    ) : (
+                      <ChevronRight size={14} />
+                    )}
                   </button>
 
                   <LayoutPanelTop size={14} className="shrink-0 opacity-70" />
 
-                  <span className="text-sm truncate flex-1">Section {sectionIndex + 1}</span>
+                  <span className="text-sm truncate flex-1">
+                    Section {sectionIndex + 1}
+                  </span>
 
                   <div
                     onClick={(e) => e.stopPropagation()}
@@ -86,7 +95,7 @@ const ComponentTree = () => {
                         {
                           label: "Edit",
                           icon: faPen,
-                          onClick: () => setEditingSectionId(section.id),
+                          onClick: () => selectSection(section.id),
                         },
                         {
                           label: "Delete",
@@ -102,10 +111,15 @@ const ComponentTree = () => {
                 {isOpen && (
                   <div className="flex flex-col ml-6 border-l border-[var(--foreground)]/10 pl-2">
                     {section.components.length === 0 ? (
-                      <p className="text-xs text-[var(--foreground)]/30 py-1">Empty</p>
+                      <p className="text-xs text-[var(--foreground)]/30 py-1">
+                        Empty
+                      </p>
                     ) : (
                       section.components.map((component) => {
-                        const def = componentRegistry[component.type as keyof typeof componentRegistry];
+                        const def =
+                          componentRegistry[
+                            component.type as keyof typeof componentRegistry
+                          ];
                         const isSelected = selectedComponentId === component.id;
 
                         return (
@@ -116,11 +130,20 @@ const ComponentTree = () => {
                               selectComponent(section.id, component.id);
                             }}
                             className={`group flex items-center gap-2 h-7 px-1 rounded cursor-pointer transition-colors ${
-                              isSelected ? "bg-[var(--foreground)]/15" : "hover:bg-[var(--foreground)]/10"
+                              isSelected
+                                ? "bg-[var(--foreground)]/15"
+                                : "hover:bg-[var(--foreground)]/10"
                             }`}
                           >
-                            {def?.icon ? <def.icon size={13} className="shrink-0 opacity-70" /> : null}
-                            <span className="text-xs truncate flex-1">{def?.label ?? component.type}</span>
+                            {def?.icon ? (
+                              <def.icon
+                                size={13}
+                                className="shrink-0 opacity-70"
+                              />
+                            ) : null}
+                            <span className="text-xs truncate flex-1">
+                              {def?.label ?? component.type}
+                            </span>
                             <div
                               onClick={(e) => e.stopPropagation()}
                               className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
@@ -130,13 +153,15 @@ const ComponentTree = () => {
                                   {
                                     label: "Edit",
                                     icon: faPen,
-                                    onClick: () => selectComponent(section.id, component.id),
+                                    onClick: () =>
+                                      selectComponent(section.id, component.id),
                                   },
                                   {
                                     label: "Delete",
                                     icon: faTrash,
                                     danger: true,
-                                    onClick: () => removeComponent(section.id, component.id),
+                                    onClick: () =>
+                                      removeComponent(section.id, component.id),
                                   },
                                 ]}
                               />
@@ -152,23 +177,6 @@ const ComponentTree = () => {
           })}
         </div>
       )}
-      {editingSectionId &&
-        (() => {
-          const section = sections.find((s) => s.id === editingSectionId);
-          return (
-            <UpdateSectionModal
-              initialValues={{
-                background: section?.background ?? undefined,
-                height: section?.height ?? undefined,
-              }}
-              onClose={() => setEditingSectionId(null)}
-              onConfirm={(values) => {
-                updateSection(editingSectionId, values);
-                setEditingSectionId(null);
-              }}
-            />
-          );
-        })()}
     </>
   );
 };
