@@ -59,6 +59,7 @@ const Toolbar = () => {
 
   return (
     <div
+      onClick={() => {showSideBar === false ? setShowSidebar(true) : null}}
       className={`bg-[var(--background-secondary)] w-60 h-full border-r-2 border-[var(--foreground)]/10 ${showSideBar ? "" : "transform-[translateX(-215px)]"} transition-transform`}
     >
       <div className="bg-[var(--foreground)]/10 p-1 flex justify-end">
@@ -68,6 +69,17 @@ const Toolbar = () => {
           onClick={() => setShowSidebar(!showSideBar)}
         />
       </div>
+
+      {!showSideBar && (
+      <div className="relative h-full">
+        <button
+          className="absolute text-sm left-full top-1/2 -translate-x-[24px] -rotate-90 origin-top-left whitespace-nowrap cursor-pointer pt-0.5 text-sm"
+        >
+          Toolbar
+        </button>
+      </div>
+      )}
+
 
       {showSideBar && (
         <main ref={containerRef} className="flex flex-col h-[calc(100%-20px)]">
