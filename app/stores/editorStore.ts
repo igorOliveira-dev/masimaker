@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { createClient } from "@/app/utils/supabase/client";
 
+export type PreviewDevice = "mobile" | "tablet" | "desktop";
+
 export interface ComponentItem {
   id: string;
   type: string;
@@ -43,6 +45,9 @@ interface EditorState {
   future: SectionItem[][];
   isDirty: boolean;
   isSaving: boolean;
+
+  previewDevice: PreviewDevice;
+  setPreviewDevice: (device: PreviewDevice) => void;
 
   setPage: (page: PageData) => void;
   setSections: (sections: SectionItem[]) => void;
@@ -88,6 +93,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
     future: [],
     isDirty: false,
     isSaving: false,
+
+    previewDevice: "desktop",
+    setPreviewDevice: (device) => set({ previewDevice: device }),
 
     selectedSectionId: null,
     selectedComponentId: null,
