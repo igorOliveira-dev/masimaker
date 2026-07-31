@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useEditorStore } from "@/app/stores/editorStore";
 import { Redo2, Undo2 } from "lucide-react";
+import { ThemeToggleButton } from "@/app/auth/components/ThemeToggleButton";
 
 const EditorHeader = () => {
   const pageTitle = useEditorStore((s) => s.page?.title);
@@ -28,10 +29,13 @@ const EditorHeader = () => {
         </Link>
         <p className="flex flex-col">
           <span className="font-semibold">{pageTitle}</span>
-          <span className="text-sm text-[var(--foreground)]/80">{pageSlug}</span>
+          <span className="text-sm text-[var(--foreground)]/80">
+            {pageSlug}
+          </span>
         </p>
       </div>
       <div className="flex items-center gap-3">
+        <ThemeToggleButton />
         <div className="flex items-center gap-1">
           <button
             onClick={undo}

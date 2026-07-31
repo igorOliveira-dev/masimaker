@@ -11,13 +11,20 @@ const MIN_PALETTE_HEIGHT = 120;
 const MIN_TREE_HEIGHT = 120;
 
 const Toolbar = () => {
+  const sections = useEditorStore((s) => s.sections);
   const addComponent = useEditorStore((s) => s.addComponent);
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
+  const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const [showSideBar, setShowSidebar] = useState(true);
 
   const containerRef = useRef<HTMLElement>(null);
   const [paletteHeight, setPaletteHeight] = useState(260); // px, valor inicial
   const isDraggingRef = useRef(false);
+
+  const section = sections.find((s) => s.id === selectedSectionId);
+  const component = section?.components.find(
+    (c) => c.id === selectedComponentId,
+  );
 
   function handleAddComponent(def: (typeof componentList)[number]) {
     if (!selectedSectionId) return;
@@ -31,7 +38,10 @@ const Toolbar = () => {
     const offsetY = e.clientY - containerRect.top;
 
     const maxHeight = containerRect.height - MIN_TREE_HEIGHT;
-    const clamped = Math.min(Math.max(offsetY, MIN_PALETTE_HEIGHT), Math.max(maxHeight, MIN_PALETTE_HEIGHT));
+    const clamped = Math.min(
+      Math.max(offsetY, MIN_PALETTE_HEIGHT),
+      Math.max(maxHeight, MIN_PALETTE_HEIGHT),
+    );
 
     setPaletteHeight(clamped);
   }, []);
@@ -51,6 +61,10 @@ const Toolbar = () => {
     };
   }, [handlePointerMove, handlePointerUp]);
 
+  useEffect(() => {
+    setShowSidebar(true);
+  }, [section, component]);
+
   function handlePointerDown() {
     isDraggingRef.current = true;
     document.body.style.cursor = "row-resize";
@@ -59,7 +73,9 @@ const Toolbar = () => {
 
   return (
     <div
-      onClick={() => {showSideBar === false ? setShowSidebar(true) : null}}
+      onClick={() => {
+        showSideBar === false ? setShowSidebar(true) : null;
+      }}
       className={`bg-[var(--background-secondary)] w-60 h-full border-r-2 border-[var(--foreground)]/10 ${showSideBar ? "" : "transform-[translateX(-215px)]"} transition-transform`}
     >
       <div className="bg-[var(--foreground)]/10 p-1 flex justify-end">
@@ -71,15 +87,12 @@ const Toolbar = () => {
       </div>
 
       {!showSideBar && (
-      <div className="relative h-full">
-        <button
-          className="absolute text-sm left-full top-1/2 -translate-x-[24px] -rotate-90 origin-top-left whitespace-nowrap cursor-pointer pt-0.5 text-sm"
-        >
-          Toolbar
-        </button>
-      </div>
+        <div className="relative h-full">
+          <button className="absolute text-sm left-full top-1/2 -translate-x-[24px] -rotate-90 origin-top-left whitespace-nowrap cursor-pointer pt-0.5 text-sm">
+            Toolbar
+          </button>
+        </div>
       )}
-
 
       {showSideBar && (
         <main ref={containerRef} className="flex flex-col h-[calc(100%-20px)]">
@@ -89,7 +102,9 @@ const Toolbar = () => {
           >
             <p className="px-2 pt-3">Components</p>
             {!selectedSectionId && (
-              <p className="px-2 pb-1 text-xs text-[var(--foreground)]/40">Selecione uma section pra adicionar</p>
+              <p className="px-2 pb-1 text-xs text-[var(--foreground)]/40">
+                Selecione uma section pra adicionar
+              </p>
             )}
             {componentList.map((def) => (
               <button
