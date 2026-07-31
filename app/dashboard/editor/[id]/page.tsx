@@ -93,7 +93,7 @@ export default function EditorPage() {
   return (
     <div className="w-full">
       <EditorHeader />
-      <main className="h-[calc(100dvh-64px)] flex">
+      <main className="h-[calc(100dvh-64px)] overflow-hidden flex">
         <Toolbar />
         <PagePreview />
         <Inspector />

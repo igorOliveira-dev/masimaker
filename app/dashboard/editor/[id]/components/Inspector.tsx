@@ -40,7 +40,7 @@ const Inspector = () => {
       <div
         onClick={() => (showSideBar === false ? setShowSidebar(true) : null)}
         className={`bg-[var(--background-secondary)] w-72 h-[calc(100%-20px)] border-l-2 border-[var(--foreground)]/10 shrink-0 ${
-          showSideBar ? "" : "transform-[translateX(255px)]"
+          showSideBar ? "" : "transform-[translateX(262px)]"
         } transition-transform`}
       >
         <div className="bg-[var(--foreground)]/10 p-1 flex justify-start">
