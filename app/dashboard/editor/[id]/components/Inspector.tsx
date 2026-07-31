@@ -5,7 +5,7 @@ import {
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useEditorStore } from "@/app/stores/editorStore";
 import { componentRegistry } from "../blocks";
 import ConfirmModal from "@/app/dashboard/components/ConfirmModal";
@@ -34,6 +34,10 @@ const Inspector = () => {
   const componentDef = component
     ? componentRegistry[component.type as keyof typeof componentRegistry]
     : undefined;
+
+  useEffect(() => {
+    setShowSidebar(true);
+  }, [section, component]);
 
   return (
     <>
@@ -161,7 +165,9 @@ const Inspector = () => {
         isOpen={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
         title={
-          deleteTarget?.type === "section" ? "Delete section" : "component"
+          deleteTarget?.type === "section"
+            ? "Delete section"
+            : "Delete component"
         }
         description="This action cannot be undone."
         confirmLabel="Delete"
