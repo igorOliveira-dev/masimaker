@@ -22,9 +22,7 @@ const Toolbar = () => {
   const isDraggingRef = useRef(false);
 
   const section = sections.find((s) => s.id === selectedSectionId);
-  const component = section?.components.find(
-    (c) => c.id === selectedComponentId,
-  );
+  const component = section?.components.find((c) => c.id === selectedComponentId);
 
   function handleAddComponent(def: (typeof componentList)[number]) {
     if (!selectedSectionId) return;
@@ -38,10 +36,7 @@ const Toolbar = () => {
     const offsetY = e.clientY - containerRect.top;
 
     const maxHeight = containerRect.height - MIN_TREE_HEIGHT;
-    const clamped = Math.min(
-      Math.max(offsetY, MIN_PALETTE_HEIGHT),
-      Math.max(maxHeight, MIN_PALETTE_HEIGHT),
-    );
+    const clamped = Math.min(Math.max(offsetY, MIN_PALETTE_HEIGHT), Math.max(maxHeight, MIN_PALETTE_HEIGHT));
 
     setPaletteHeight(clamped);
   }, []);
@@ -102,9 +97,7 @@ const Toolbar = () => {
           >
             <p className="px-2 pt-3">Components</p>
             {!selectedSectionId && (
-              <p className="px-2 pb-1 text-xs text-[var(--foreground)]/40">
-                Selecione uma section pra adicionar
-              </p>
+              <p className="px-2 pb-1 text-xs text-[var(--foreground)]/40">Select a section to add components.</p>
             )}
             {componentList.map((def) => (
               <button

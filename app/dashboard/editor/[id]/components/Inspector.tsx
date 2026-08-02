@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  faAnglesRight,
-  faChevronLeft,
-} from "@fortawesome/free-solid-svg-icons";
+import { faAnglesRight, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { useEditorStore } from "@/app/stores/editorStore";
@@ -22,18 +19,12 @@ const Inspector = () => {
   const [showSideBar, setShowSidebar] = useState(true);
 
   const [deleteTarget, setDeleteTarget] = useState<
-    | { type: "section"; sectionId: string }
-    | { type: "component"; sectionId: string; componentId: string }
-    | null
+    { type: "section"; sectionId: string } | { type: "component"; sectionId: string; componentId: string } | null
   >(null);
 
   const section = sections.find((s) => s.id === selectedSectionId);
-  const component = section?.components.find(
-    (c) => c.id === selectedComponentId,
-  );
-  const componentDef = component
-    ? componentRegistry[component.type as keyof typeof componentRegistry]
-    : undefined;
+  const component = section?.components.find((c) => c.id === selectedComponentId);
+  const componentDef = component ? componentRegistry[component.type as keyof typeof componentRegistry] : undefined;
 
   useEffect(() => {
     setShowSidebar(true);
@@ -68,9 +59,7 @@ const Inspector = () => {
         {showSideBar && (
           <div className="flex flex-col h-[calc(100%-20px)] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {!section && (
-              <p className="px-3 pt-4 text-xs text-[var(--foreground)]/40">
-                Selecione uma section ou um component pra editar.
-              </p>
+              <p className="px-3 pt-4 text-xs text-[var(--foreground)]/40">Select a section or a component to edit.</p>
             )}
 
             {section && !component && (
@@ -95,9 +84,7 @@ const Inspector = () => {
                   <input
                     type="color"
                     value={section.background ?? "#ffffff"}
-                    onChange={(e) =>
-                      updateSection(section.id, { background: e.target.value })
-                    }
+                    onChange={(e) => updateSection(section.id, { background: e.target.value })}
                     className="h-8 w-full cursor-pointer rounded border border-[var(--foreground)]/10"
                   />
                 </label>
@@ -142,19 +129,12 @@ const Inspector = () => {
                   </button>
                 </div>
 
-                <p className="text-sm">
-                  {componentDef?.label ?? component.type}
-                </p>
+                <p className="text-sm">{componentDef?.label ?? component.type}</p>
 
                 {componentDef?.Inspector ? (
-                  <componentDef.Inspector
-                    component={component}
-                    sectionId={section.id}
-                  />
+                  <componentDef.Inspector component={component} sectionId={section.id} />
                 ) : (
-                  <p className="text-xs text-[var(--foreground)]/40">
-                    Esse component ainda não tem opções de edição.
-                  </p>
+                  <p className="text-xs text-[var(--foreground)]/40">Esse component ainda não tem opções de edição.</p>
                 )}
               </div>
             )}
@@ -164,11 +144,7 @@ const Inspector = () => {
       <ConfirmModal
         isOpen={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
-        title={
-          deleteTarget?.type === "section"
-            ? "Delete section"
-            : "Delete component"
-        }
+        title={deleteTarget?.type === "section" ? "Delete section" : "Delete component"}
         description="This action cannot be undone."
         confirmLabel="Delete"
         danger
