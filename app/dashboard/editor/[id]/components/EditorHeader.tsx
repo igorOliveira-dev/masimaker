@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useEditorStore } from "@/app/stores/editorStore";
-import { Redo2, Undo2 } from "lucide-react";
+import { Redo2, Undo2, QrCode } from "lucide-react";
 import { ThemeToggleButton } from "@/app/auth/components/ThemeToggleButton";
+import QrCodeModal from "./QrCodeModal";
 
 const EditorHeader = () => {
   const pageTitle = useEditorStore((s) => s.page?.title);
@@ -18,6 +20,8 @@ const EditorHeader = () => {
   const canUndo = useEditorStore((s) => s.history.length > 0);
   const canRedo = useEditorStore((s) => s.future.length > 0);
 
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+
   return (
     <div className="w-full h-16 bg-[var(--background-secondary)] flex items-center justify-between px-4 border-b-2 border-[var(--foreground)]/10">
       <div className="flex items-center gap-4">
@@ -29,11 +33,18 @@ const EditorHeader = () => {
         </Link>
         <p className="flex flex-col">
           <span className="font-semibold">{pageTitle}</span>
-          <span className="text-sm text-[var(--foreground)]/80">
-            {pageSlug}
-          </span>
+          <span className="text-sm text-[var(--foreground)]/80">{pageSlug}</span>
         </p>
+        <button
+          onClick={() => setIsQrModalOpen(true)}
+          disabled={!pageSlug}
+          aria-label="View access QR code"
+          className="cursor-pointer w-8 h-8 flex items-center justify-center hover:bg-[var(--foreground)]/10 transition-colors rounded-full disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <QrCode size={20} />
+        </button>
       </div>
+
       <div className="flex items-center gap-3">
         <ThemeToggleButton />
         <div className="flex items-center gap-1">
@@ -57,9 +68,11 @@ const EditorHeader = () => {
           disabled={!isDirty || isSaving}
           className="cursor-pointer p-1 px-4 bg-green-600 text-white border-2 rounded-lg border-[var(--foreground)]/10 hover:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {isSaving ? "Salvando..." : "Salvar"}
+          {isSaving ? "Saving..." : "Save"}
         </button>
       </div>
+
+      {pageSlug && <QrCodeModal isOpen={isQrModalOpen} onClose={() => setIsQrModalOpen(false)} slug={pageSlug} />}
     </div>
   );
 };
