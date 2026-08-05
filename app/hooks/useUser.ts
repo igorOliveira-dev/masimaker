@@ -13,6 +13,7 @@ type Profile = {
   created_at: string;
 };
 
+// Hook responsável por carregar o usuário autenticado e o perfil associado.
 export function useUser() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);

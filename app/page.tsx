@@ -1,3 +1,5 @@
+// Esta é a landing page pública do produto.
+
 "use client";
 
 // Landing page do MasiMaker
@@ -40,6 +42,7 @@ const structure = [
   },
 ];
 
+// Página inicial pública que apresenta o produto e encaminha para login ou criação de páginas.
 export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">

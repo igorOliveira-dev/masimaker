@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/app/utils/supabase/server";
 import { cookies } from "next/headers";
 
+// Executa o fluxo de autenticação por email e senha para entrar na aplicação.
 export async function login(formData: FormData) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -26,6 +27,7 @@ export async function login(formData: FormData) {
   redirect("/dashboard");
 }
 
+// Cria um novo usuário no Supabase e redireciona para a tela de confirmação.
 export async function signup(formData: FormData) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
@@ -44,6 +46,7 @@ export async function signup(formData: FormData) {
   redirect("/auth/login?message=Check your email to confirm your registration.");
 }
 
+// Encera a sessão ativa e redireciona o usuário de volta para o login.
 export async function logout() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);

@@ -1,3 +1,5 @@
+// Este arquivo define o layout compartilhado das rotas do dashboard.
+
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/app/utils/supabase/server";

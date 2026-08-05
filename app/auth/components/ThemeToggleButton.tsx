@@ -1,8 +1,11 @@
+// Este componente alterna o tema claro/escuro da interface.
+
 "use client";
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
+// Alterna entre tema claro e escuro e persiste a preferência no navegador.
 export function ThemeToggleButton() {
 const [theme, setTheme] = useState<"light" | "dark">("light");
 

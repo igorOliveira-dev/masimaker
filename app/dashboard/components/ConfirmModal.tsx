@@ -1,3 +1,5 @@
+// Este componente exibe um modal de confirmação para ações destrutivas.
+
 "use client";
 
 import { useState } from "react";
@@ -27,6 +29,7 @@ export default function ConfirmModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Executa a ação confirmada e fecha o modal quando tudo correr bem.
   async function handleConfirm() {
     setError(null);
     setLoading(true);
@@ -40,6 +43,7 @@ export default function ConfirmModal({
     }
   }
 
+  // Fecha o modal sem permitir interrupções durante uma ação em andamento.
   function handleClose() {
     if (loading) return; // evita fechar no meio de uma ação em andamento
     setError(null);

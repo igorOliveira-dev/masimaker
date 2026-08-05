@@ -1,3 +1,5 @@
+// Este arquivo define o store global do editor com estado, ações e persistência.
+
 import { create } from "zustand";
 import { createClient } from "@/app/utils/supabase/client";
 
@@ -79,6 +81,7 @@ interface EditorState {
 
 export const useEditorStore = create<EditorState>((set, get) => {
   // helper interno, não faz parte da interface pública do store
+  // Salva o estado atual das sections no histórico para permitir desfazer e refazer.
   function pushHistory() {
     const { sections, history } = get();
     const snapshot = structuredClone(sections);
@@ -118,6 +121,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         isDirty: false,
       }),
 
+    // Cria uma nova section vazia e a seleciona automaticamente no editor.
     addSection: () => {
       const { sections, page } = get();
       if (!page) return;
@@ -139,6 +143,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       });
     },
 
+    // Atualiza os campos de uma section existente no estado do editor.
     updateSection: (sectionId, patch) => {
       pushHistory();
       set((state) => ({
@@ -149,6 +154,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }));
     },
 
+    // Remove uma section do estado e reajusta suas posições.
     removeSection: (sectionId) => {
       pushHistory();
       set((state) => ({
@@ -159,6 +165,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }));
     },
 
+    // Adiciona um novo component à section selecionada usando a definição do bloco.
     addComponent: (def, sectionId) => {
       pushHistory();
       set((state) => ({
@@ -183,6 +190,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }));
     },
 
+    // Remove um component específico da section indicada.
     removeComponent: (sectionId, componentId) => {
       pushHistory();
       set((state) => ({
@@ -198,6 +206,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }));
     },
 
+    // Atualiza os atributos e cores de um component já existente.
     updateComponent: (
       sectionId,
       componentId,
@@ -226,6 +235,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         isDirty: true,
       })),
 
+    // Restaura o estado anterior das sections a partir do histórico.
     undo: () => {
       const { history, sections, future } = get();
       if (history.length === 0) return;
@@ -238,6 +248,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       });
     },
 
+    // Reaplica um estado removido pelo undo, se existir no futuro.
     redo: () => {
       const { future, sections, history } = get();
       if (future.length === 0) return;
@@ -250,6 +261,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       });
     },
 
+    // Persiste as sections e components no banco Supabase e atualiza o estado salvo.
     save: async () => {
       const { page, sections, savedSections } = get();
       if (!page) return;

@@ -1,3 +1,5 @@
+// Este painel lateral permite editar as propriedades do item selecionado no editor.
+
 "use client";
 
 import { faAnglesRight, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +18,7 @@ const Inspector = () => {
   const removeComponent = useEditorStore((s) => s.removeComponent);
   const selectSection = useEditorStore((s) => s.selectSection);
 
+  // Controla se o painel lateral de edição está aberto ou recolhido.
   const [showSideBar, setShowSidebar] = useState(true);
 
   const [deleteTarget, setDeleteTarget] = useState<
@@ -26,6 +29,7 @@ const Inspector = () => {
   const component = section?.components.find((c) => c.id === selectedComponentId);
   const componentDef = component ? componentRegistry[component.type as keyof typeof componentRegistry] : undefined;
 
+  // Reabre o painel sempre que a seleção mudar para manter a edição visível.
   useEffect(() => {
     setShowSidebar(true);
   }, [section, component]);

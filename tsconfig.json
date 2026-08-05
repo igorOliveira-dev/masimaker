@@ -1,3 +1,5 @@
+// Este arquivo define as opções de compilação e tipagem do TypeScript.
+
 {
   "compilerOptions": {
     "target": "ES2017",

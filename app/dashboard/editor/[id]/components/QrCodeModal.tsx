@@ -1,3 +1,5 @@
+// Este componente mostra um modal com o QR code do link da página.
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -32,11 +34,12 @@ export default function QrCodeModal({ isOpen, onClose, slug }: QrCodeModalProps)
       .catch((err) => console.error("Erro ao gerar QR code:", err));
   }, [isOpen, slug, pageUrl]);
 
-  // Reseta o estado de "copiado" ao fechar
+  // Reseta o estado de "copiado" quando o modal é fechado.
   useEffect(() => {
     if (!isOpen) setCopied(false);
   }, [isOpen]);
 
+  // Copia o link da página para a área de transferência do usuário.
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(pageUrl);
@@ -47,6 +50,7 @@ export default function QrCodeModal({ isOpen, onClose, slug }: QrCodeModalProps)
     }
   };
 
+  // Faz o download da imagem do QR code gerada para a página.
   const handleDownload = () => {
     if (!qrDataUrl) return;
     const link = document.createElement("a");
@@ -57,6 +61,7 @@ export default function QrCodeModal({ isOpen, onClose, slug }: QrCodeModalProps)
     document.body.removeChild(link);
   };
 
+  // Abre a página pública em uma nova aba para visualização rápida.
   const handleAccess = () => {
     window.open(pageUrl, "_blank", "noopener,noreferrer");
   };

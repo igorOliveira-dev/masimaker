@@ -1,9 +1,12 @@
+// Este componente renderiza o formulário para criar uma nova página.
+
 "use client";
 
 import { useState } from "react";
 import { createClient } from "@/app/utils/supabase/client"; // ajuste o caminho conforme seu projeto
 
 // Gera um slug simples a partir do título (letras minúsculas, números e hífens)
+// Converte um título em um slug amigável para a URL da página.
 function slugify(text: string) {
   return text
     .normalize("NFD")
@@ -35,6 +38,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Atualiza o título e gera automaticamente o slug enquanto o usuário digita.
   function handleTitleChange(value: string) {
     setTitle(value);
     if (!slugEditedManually) {
@@ -42,11 +46,13 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
     }
   }
 
+  // Permite que o slug seja editado manualmente pelo usuário.
   function handleSlugChange(value: string) {
     setSlugEditedManually(true);
     setSlug(slugify(value));
   }
 
+  // Cria a página no banco e notifica o componente pai quando a operação termina.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);

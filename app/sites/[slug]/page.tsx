@@ -1,3 +1,5 @@
+// Esta página renderiza a versão pública de uma página para um slug específico.
+
 import { createClient } from "@/app/utils/supabase/server"; // versão server-side do client
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -19,6 +21,7 @@ interface SectionItem {
   components: ComponentItem[];
 }
 
+// Renderiza um componente público de acordo com o tipo e seus atributos.
 function RenderComponent({ component }: { component: ComponentItem }) {
   const style = {
     color: component.colors?.text,
@@ -55,6 +58,7 @@ function RenderComponent({ component }: { component: ComponentItem }) {
   }
 }
 
+// Busca a página e suas sections pelo slug e monta a versão pública do site.
 export default async function PublicSitePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params; // <- unwrap aqui
 

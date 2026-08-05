@@ -1,3 +1,5 @@
+// Este componente encapsula o comportamento de um modal genérico na interface.
+
 "use client";
 
 import { useEffect } from "react";
@@ -13,6 +15,7 @@ interface ModalProps {
 
 export default function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-md" }: ModalProps) {
   // Fecha com ESC
+  // Garante que o modal feche com Escape e que o scroll do body seja travado enquanto estiver aberto.
   useEffect(() => {
     if (!isOpen) return;
 
