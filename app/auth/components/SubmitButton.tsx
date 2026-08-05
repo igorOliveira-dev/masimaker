@@ -1,7 +1,10 @@
+// Este componente exibe o botão de envio com estado de carregamento para os formulários de auth.
+
 "use client";
 
 import { useFormStatus } from "react-dom";
 
+// Botão de envio com estado de carregamento para formulários de autenticação.
 export function SubmitButton({ children }: { children: React.ReactNode }) {
   const { pending } = useFormStatus();
 

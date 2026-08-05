@@ -1,3 +1,5 @@
+// Este componente monta o cabeçalho superior da página de edição.
+
 "use client";
 
 import { useState } from "react";
@@ -9,6 +11,7 @@ import { Redo2, Undo2, QrCode } from "lucide-react";
 import { ThemeToggleButton } from "@/app/auth/components/ThemeToggleButton";
 import QrCodeModal from "./QrCodeModal";
 
+// Exibe o cabeçalho do editor com ações de navegação, undo/redo, salvar e QR code.
 const EditorHeader = () => {
   const pageTitle = useEditorStore((s) => s.page?.title);
   const pageSlug = useEditorStore((s) => s.page?.slug);

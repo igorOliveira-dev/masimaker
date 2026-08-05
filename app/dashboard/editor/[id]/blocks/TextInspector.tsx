@@ -1,3 +1,5 @@
+// Este componente controla as opções de edição de um bloco de texto.
+
 "use client";
 
 import { useEditorStore } from "@/app/stores/editorStore";
@@ -8,6 +10,7 @@ interface TextInspectorProps {
   sectionId: string;
 }
 
+// Exibe os controles de edição para o bloco de texto selecionado.
 const TextInspector = ({ component, sectionId }: TextInspectorProps) => {
   const updateComponent = useEditorStore((s) => s.updateComponent);
   const { attributes, colors } = component;

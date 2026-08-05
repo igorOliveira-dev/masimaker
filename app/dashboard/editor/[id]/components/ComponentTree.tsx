@@ -1,3 +1,5 @@
+// Este componente mostra a estrutura da página em forma de árvore com sections e components.
+
 "use client";
 
 import { ChevronDown, ChevronRight, LayoutPanelTop, Plus } from "lucide-react";
@@ -20,6 +22,7 @@ const ComponentTree = () => {
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
+  // Alterna a visibilidade dos componentes internos de uma section na árvore.
   function toggleCollapse(sectionId: string) {
     setCollapsed((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
   }

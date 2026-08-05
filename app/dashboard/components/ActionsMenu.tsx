@@ -1,3 +1,5 @@
+// Este componente cria um menu de ações reutilizável para itens do dashboard.
+
 "use client";
 
 import {
@@ -26,6 +28,7 @@ interface ActionsMenuPanelProps {
   children: ReactNode;
 }
 
+// Procura o container de scroll mais próximo para fechar o menu quando a página se mover.
 function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
   let parent = el?.parentElement ?? null;
   while (parent) {
@@ -42,6 +45,7 @@ function findScrollParent(el: HTMLElement | null): HTMLElement | Window {
   return window;
 }
 
+// Renderiza o painel do menu dentro de um portal, posicionando-o perto do botão que o abriu.
 function ActionsMenuPanel({
   anchorRef,
   onClose,
@@ -51,6 +55,7 @@ function ActionsMenuPanel({
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [ready, setReady] = useState(false);
 
+  // Calcula a posição ideal do menu para que ele caiba na viewport sem ficar fora da tela.
   useLayoutEffect(() => {
     function updatePosition() {
       if (!anchorRef.current || !menuRef.current) return;
@@ -183,6 +188,7 @@ interface ActionsMenuProps {
 
 //  Botão de 3 pontinhos que abre um menu de ações posicionado via portal,
 
+// Componente principal que controla o botão de três pontinhos e abre o menu de opções.
 export default function ActionsMenu({
   options,
   buttonClassName = "",

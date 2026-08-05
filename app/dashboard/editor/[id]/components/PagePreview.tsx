@@ -1,3 +1,5 @@
+// Este componente exibe uma pré-visualização da página sendo editada.
+
 "use client";
 
 import { useRef } from "react";
@@ -20,6 +22,7 @@ const PagePreview = () => {
 
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  // Inicia o ajuste manual da altura de uma section ao arrastar a barra inferior.
   function handleResizeStart(e: React.MouseEvent, sectionId: string) {
     const el = sectionRefs.current[sectionId];
     if (!el) return;

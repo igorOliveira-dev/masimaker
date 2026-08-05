@@ -1,3 +1,5 @@
+// Este componente alterna entre os tamanhos de viewport usados na pré-visualização.
+
 "use client";
 
 import { Smartphone, Tablet, Monitor } from "lucide-react";
@@ -13,6 +15,7 @@ const options: {
   { value: "desktop", icon: Monitor, label: "Computador" },
 ];
 
+// Exibe os botões para alternar o tamanho do viewport da pré-visualização.
 export default function PreviewDeviceToggle() {
   const previewDevice = useEditorStore((s) => s.previewDevice);
   const setPreviewDevice = useEditorStore((s) => s.setPreviewDevice);

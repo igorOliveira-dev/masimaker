@@ -1,3 +1,5 @@
+// Esta barra lateral reúne a paleta de componentes e a estrutura da página.
+
 "use client";
 
 import { faAnglesLeft } from "@fortawesome/free-solid-svg-icons";
@@ -24,11 +26,13 @@ const Toolbar = () => {
   const section = sections.find((s) => s.id === selectedSectionId);
   const component = section?.components.find((c) => c.id === selectedComponentId);
 
+  // Adiciona um componente novo à section selecionada usando a definição recebida.
   function handleAddComponent(def: (typeof componentList)[number]) {
     if (!selectedSectionId) return;
     addComponent(def, selectedSectionId);
   }
 
+  // Atualiza a altura da paleta de componentes enquanto o usuário arrasta o separador.
   const handlePointerMove = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current || !containerRef.current) return;
 
@@ -41,6 +45,7 @@ const Toolbar = () => {
     setPaletteHeight(clamped);
   }, []);
 
+  // Finaliza o arrasto do separador e limpa o estado visual da interação.
   const handlePointerUp = useCallback(() => {
     isDraggingRef.current = false;
     document.body.style.cursor = "";
@@ -60,6 +65,7 @@ const Toolbar = () => {
     setShowSidebar(true);
   }, [section, component]);
 
+  // Marca o início do arrasto para redimensionar a paleta de componentes.
   function handlePointerDown() {
     isDraggingRef.current = true;
     document.body.style.cursor = "row-resize";

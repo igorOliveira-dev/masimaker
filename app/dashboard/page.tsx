@@ -1,3 +1,5 @@
+// Esta página exibe a home do dashboard com as páginas do usuário.
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,6 +21,7 @@ interface PageItem {
   created_at: string;
 }
 
+// Página principal do dashboard que lista, cria e remove páginas do usuário.
 export default function MyPages() {
   const supabase = createClient();
 
@@ -31,6 +34,7 @@ export default function MyPages() {
   // Estado para o modal de confirmação de exclusão
   const [pageToDelete, setPageToDelete] = useState<PageItem | null>(null);
 
+  // Busca as páginas do usuário no banco e atualiza o estado local para renderização.
   async function loadPages(userId: string) {
     setLoading(true);
     setError(null);
@@ -50,6 +54,7 @@ export default function MyPages() {
   }
 
   useEffect(() => {
+// Executa a lógica de init para este arquivo.
     async function init() {
       const {
         data: { user },
@@ -68,11 +73,13 @@ export default function MyPages() {
     init();
   }, []);
 
+  // Fecha o modal de criação e recarrega a lista depois de criar uma nova página.
   function handlePageCreated() {
     setIsCreateOpen(false);
     if (ownerId) loadPages(ownerId);
   }
 
+  // Remove a página selecionada e atualiza a lista sem recarregar a tela inteira.
   async function handleDeletePage() {
     if (!pageToDelete) return;
 

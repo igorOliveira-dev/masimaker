@@ -1,3 +1,5 @@
+// Esta página carrega a page selecionada e suas sections para o editor.
+
 "use client";
 
 import { useEffect } from "react";
@@ -26,6 +28,7 @@ export default function EditorPage() {
   const setPage = useEditorStore((s) => s.setPage);
   const setSections = useEditorStore((s) => s.setSections);
 
+  // Busca as sections da página no banco e prepara o estado do editor para renderização.
   async function loadSections(pageId: string) {
     const { data: sectionsData, error: sectionsError } = await supabase
       .from("sections")
@@ -50,6 +53,7 @@ export default function EditorPage() {
     setSections(sorted);
   }
 
+  // Carrega a página e suas sections quando o id muda na URL.
   useEffect(() => {
     async function load() {
       if (!params?.id) return;

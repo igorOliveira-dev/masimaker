@@ -1,3 +1,5 @@
+// Este arquivo reúne helpers de middleware para autenticação e sessão com Supabase.
+
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 

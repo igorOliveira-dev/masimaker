@@ -1,3 +1,5 @@
+// Este arquivo registra os blocos editáveis do editor e seus inspectores.
+
 import { Type } from "lucide-react";
 import Text from "./Text";
 import TextInspector from "./TextInspector";
@@ -18,6 +20,7 @@ export interface ComponentDefinition {
   defaultColors: Record<string, any>;
 }
 
+// Registra os blocos suportados pelo editor e os componentes de inspeção associados.
 export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
   text: {
     type: "text",

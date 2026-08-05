@@ -1,9 +1,12 @@
+// Esta página renderiza a tela de cadastro do usuário.
+
 import Link from "next/link";
 import { signup } from "../actions";
 import { SubmitButton } from "../components/SubmitButton";
 import { AuthCard } from "../components/AuthCard";
 import { ThemeToggleButton } from "../components/ThemeToggleButton";
 
+// Tela de cadastro com formulário para criar uma conta nova no sistema.
 export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const params = await searchParams;
 

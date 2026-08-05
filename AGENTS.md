@@ -1,3 +1,5 @@
+<\!-- Este arquivo guarda instruções específicas para agentes que trabalham neste projeto. -->
+
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 

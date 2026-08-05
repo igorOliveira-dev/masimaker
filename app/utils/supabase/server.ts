@@ -1,3 +1,5 @@
+// Este arquivo cria o cliente Supabase usado no lado do servidor.
+
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

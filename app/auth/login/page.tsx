@@ -1,9 +1,12 @@
+// Esta página renderiza a tela de login do usuário.
+
 import Link from "next/link";
 import { login } from "../actions";
 import { SubmitButton } from "../components/SubmitButton";
 import { AuthCard } from "../components/AuthCard";
 import { ThemeToggleButton } from "../components/ThemeToggleButton";
 
+// Tela de login com formulário, feedback de erro e link para cadastro.
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; message?: string }> }) {
   const params = await searchParams;
 
