@@ -16,7 +16,9 @@ const DEVICE_WIDTHS: Record<string, string> = {
 const PagePreview = () => {
   const sections = useEditorStore((s) => s.sections);
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
+  const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectSection = useEditorStore((s) => s.selectSection);
+  const selectComponent = useEditorStore((s) => s.selectComponent);
   const updateSection = useEditorStore((s) => s.updateSection);
   const previewDevice = useEditorStore((s) => s.previewDevice);
 
@@ -64,7 +66,10 @@ const PagePreview = () => {
             return (
               <div
                 key={section.id}
-                onClick={() => selectSection(section.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  selectSection(section.id);
+                }}
                 className={`w-full relative cursor-pointer transition-colors overflow-visible ${
                   isSelected
                     ? "ring-4 ring-blue-500 ring-offset-1 ring-offset-[var(--background)] z-10"
@@ -89,8 +94,19 @@ const PagePreview = () => {
                           ];
                         if (!def) return null;
                         const { Component } = def;
+                        const isComponentSelected = selectedComponentId === component.id;
+
                         return (
-                          <Component key={component.id} component={component} />
+                          <div
+                            key={component.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              selectComponent(section.id, component.id);
+                            }}
+                            className={`w-full ${isComponentSelected ? "ring-2 ring-blue-500 ring-offset-1 ring-offset-[var(--background)]" : ""}`}
+                          >
+                            <Component component={component} />
+                          </div>
                         );
                       })
                     : null}
