@@ -15,6 +15,7 @@ export interface ComponentItem {
 
 export interface SectionItem {
   id: string;
+  name?: string | null;
   background?: string | null;
   colors?: Record<string, any> | null;
   height?: number | null;
