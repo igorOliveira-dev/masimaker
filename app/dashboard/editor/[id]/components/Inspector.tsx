@@ -34,14 +34,14 @@ const Inspector = () => {
     <>
       <div
         onClick={() => (showSideBar === false ? setShowSidebar(true) : null)}
-        className={`bg-[var(--background-secondary)] w-72 h-[calc(100%-20px)] border-l-2 border-[var(--foreground)]/10 shrink-0 ${
+        className={`bg-(--background-secondary) w-72 h-[calc(100%-20px)] border-l-2 border-(--foreground)/10 shrink-0 ${
           showSideBar ? "" : "transform-[translateX(262px)]"
         } transition-transform`}
       >
-        <div className="bg-[var(--foreground)]/10 p-1 flex justify-start">
+        <div className="bg-(--foreground)/10 p-1 flex justify-start">
           <FontAwesomeIcon
             icon={faAnglesRight}
-            className={`text-[var(--foreground)]/80 font-thin text-xs cursor-pointer transition-transform ${
+            className={`text-(--foreground)/80 font-thin text-xs cursor-pointer transition-transform ${
               showSideBar ? "" : "rotate-180"
             }`}
             onClick={() => setShowSidebar(!showSideBar)}
@@ -50,16 +50,16 @@ const Inspector = () => {
 
         {!showSideBar && (
           <div className="relative h-full">
-            <button className="absolute text-sm right-full top-1/2 -rotate-90 origin-top-right whitespace-nowrap cursor-pointer pt-0.5 text-sm">
+            <button className="absolute text-sm right-full top-1/2 -rotate-90 origin-top-right whitespace-nowrap cursor-pointer pt-0.5">
               Inspector
             </button>
           </div>
         )}
 
         {showSideBar && (
-          <div className="flex flex-col h-[calc(100%-20px)] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-col h-[calc(100%-20px)] overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {!section && (
-              <p className="px-3 pt-4 text-xs text-[var(--foreground)]/40">Select a section or a component to edit.</p>
+              <p className="px-3 pt-4 text-xs text-(--foreground)/40">Select a section or a component to edit.</p>
             )}
 
             {section && !component && (
@@ -85,7 +85,7 @@ const Inspector = () => {
                     type="color"
                     value={section.background ?? "#ffffff"}
                     onChange={(e) => updateSection(section.id, { background: e.target.value })}
-                    className="h-8 w-full cursor-pointer rounded border border-[var(--foreground)]/10"
+                    className="h-8 w-full cursor-pointer rounded border border-(--foreground)/10"
                   />
                 </label>
 
@@ -100,7 +100,7 @@ const Inspector = () => {
                         height: Number(e.target.value),
                       })
                     }
-                    className="h-8 px-2 rounded border border-[var(--foreground)]/10 bg-transparent text-sm"
+                    className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
                   />
                 </label>
               </div>
@@ -111,7 +111,7 @@ const Inspector = () => {
                 <div className="flex items-center justify-between">
                   <button
                     onClick={() => selectSection(section.id)}
-                    className="cursor-pointer flex items-center gap-1 text-xs text-[var(--foreground)]/60 hover:opacity-70 transition-opacity"
+                    className="cursor-pointer flex items-center gap-1 text-xs text-(--foreground)/60 hover:opacity-70 transition-opacity"
                   >
                     <FontAwesomeIcon icon={faChevronLeft} /> Section
                   </button>
@@ -134,7 +134,7 @@ const Inspector = () => {
                 {componentDef?.Inspector ? (
                   <componentDef.Inspector component={component} sectionId={section.id} />
                 ) : (
-                  <p className="text-xs text-[var(--foreground)]/40">Esse component ainda não tem opções de edição.</p>
+                  <p className="text-xs text-(--foreground)/40">Esse component ainda não tem opções de edição.</p>
                 )}
               </div>
             )}

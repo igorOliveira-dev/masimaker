@@ -39,13 +39,15 @@ function RenderComponent({ component }: { component: ComponentItem }) {
         </p>
       );
     case "image":
-      return <img src={component.attributes?.src} alt={component.attributes?.alt ?? ""} className="max-w-full rounded-md" />;
+      return (
+        <img src={component.attributes?.src} alt={component.attributes?.alt ?? ""} className="max-w-full rounded-md" />
+      );
     case "button":
       return (
         <a
           href={component.attributes?.href ?? "#"}
           style={style}
-          className="inline-block px-4 py-2 rounded-md font-medium bg-[var(--purple)] text-white"
+          className="inline-block px-4 py-2 rounded-md font-medium bg-(--purple) text-white"
         >
           {component.attributes?.label ?? "Button"}
         </a>
@@ -93,7 +95,7 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
           }}
           className="w-full px-4 py-12 flex flex-col gap-4 items-center"
         >
-          <div className="max-w-[1080px] w-full flex flex-col gap-4">
+          <div className="max-w-270 w-full flex flex-col gap-4">
             {section.components.map((component) => (
               <RenderComponent key={component.id} component={component} />
             ))}

@@ -51,7 +51,7 @@ const PagePreview = () => {
         <PreviewDeviceToggle />
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto bg-[var(--background)] p-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto bg-background p-6 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div
           className={`mx-auto flex flex-col transition-[max-width] duration-300 ease-in-out rounded overflow-hidden ${DEVICE_WIDTHS[previewDevice]}`}
         >
@@ -66,9 +66,7 @@ const PagePreview = () => {
                 }}
                 onClick={() => selectSection(section.id)}
                 className={`w-full relative cursor-pointer transition-colors ${
-                  isSelected
-                    ? "outline outline-2 outline-blue-500 z-1"
-                    : "hover:outline hover:outline-1 hover:outline-[var(--foreground)]/20"
+                  isSelected ? "outline outline-blue-500 z-1" : "hover:outline hover:outline-(--foreground)/20"
                 }`}
                 style={{
                   backgroundColor: section.background ?? undefined,
@@ -77,15 +75,10 @@ const PagePreview = () => {
               >
                 {section.components.length > 0
                   ? section.components.map((component) => {
-                      const def =
-                        componentRegistry[
-                          component.type as keyof typeof componentRegistry
-                        ];
+                      const def = componentRegistry[component.type as keyof typeof componentRegistry];
                       if (!def) return null;
                       const { Component } = def;
-                      return (
-                        <Component key={component.id} component={component} />
-                      );
+                      return <Component key={component.id} component={component} />;
                     })
                   : null}
 
@@ -93,7 +86,7 @@ const PagePreview = () => {
                   onMouseDown={(e) => handleResizeStart(e, section.id)}
                   className="absolute bottom-0 left-0 w-full h-2 cursor-row-resize flex items-center justify-center group"
                 >
-                  <div className="w-16 h-1 rounded-full bg-[var(--foreground)]/20 group-hover:bg-[var(--foreground)]/40 transition-colors" />
+                  <div className="w-16 h-1 rounded-full bg-(--foreground)/20 group-hover:bg-(--foreground)/40 transition-colors" />
                 </div>
               </div>
             );

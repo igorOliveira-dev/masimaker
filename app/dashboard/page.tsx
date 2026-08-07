@@ -76,10 +76,7 @@ export default function MyPages() {
   async function handleDeletePage() {
     if (!pageToDelete) return;
 
-    const { error: deleteError } = await supabase
-      .from("pages")
-      .delete()
-      .eq("id", pageToDelete.id);
+    const { error: deleteError } = await supabase.from("pages").delete().eq("id", pageToDelete.id);
 
     if (deleteError) {
       throw new Error("Error deleting the page");
@@ -90,17 +87,15 @@ export default function MyPages() {
   }
 
   return (
-    <div className="max-w-[1080px] w-full mx-auto px-4 py-8 pt-28">
-      <header className=" top-0 left-0 w-full bg-[var(--background-secondary)]/50 backdrop-blur-sm fixed flex items-center justify-between px-6 py-5 md:px-12 z-1">
-        <h1 className="text-[var(--purple)] font-press-start text-xl">
-          My Pages
-        </h1>
+    <div className="max-w-270 w-full mx-auto px-4 py-8 pt-28">
+      <header className=" top-0 left-0 w-full bg-(--background-secondary)/50 backdrop-blur-sm fixed flex items-center justify-between px-6 py-5 md:px-12 z-1">
+        <h1 className="text-(--purple) font-press-start text-xl">My Pages</h1>
         <div className="flex items-center gap-2">
           <ThemeToggleButton />
           <button
             onClick={() => ownerId && setIsCreateOpen(true)}
             disabled={!ownerId}
-            className="cursor-pointer p-1 px-4 bg-[var(--purple)] border-2 rounded-lg  border-[var(--foreground)]/10 hover:opacity-80 transition-opacity"
+            className="cursor-pointer p-1 px-4 bg-(--purple) border-2 rounded-lg  border-(--foreground)/10 hover:opacity-80 transition-opacity"
           >
             <span className="font-semibold text-white">+ Create new page</span>
           </button>
@@ -123,22 +118,18 @@ export default function MyPages() {
             <Link
               key={page.id}
               href={`/dashboard/editor/${page.id}`}
-              className="w-full border-2 border-[var(--foreground)]/10 rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
+              className="w-full border-2 border-(--foreground)/10 rounded-lg overflow-hidden hover:opacity-80 transition-opacity"
             >
               <div
                 className="h-32 w-full"
                 style={{
-                  background: page.color_theme
-                    ? `var(--theme-${page.color_theme}-bg, #e5e7eb)`
-                    : "#e5e7eb",
+                  background: page.color_theme ? `var(--theme-${page.color_theme}-bg, #e5e7eb)` : "#e5e7eb",
                 }}
               />
-              <div className="px-3 py-2 min-h-16 bg-[var(--background-secondary)] flex items-center justify-between shadow">
+              <div className="px-3 py-2 min-h-16 bg-(--background-secondary) flex items-center justify-between shadow">
                 <div>
                   <p className="text-sm font-medium truncate">{page.title}</p>
-                  <p className="text-xs opacity-80 truncate">
-                    {page.slug}.masimaker.com
-                  </p>
+                  <p className="text-xs opacity-80 truncate">{page.slug}.masimaker.com</p>
                 </div>
                 <div onClick={(e) => e.preventDefault()}>
                   <ActionsMenu
@@ -167,17 +158,9 @@ export default function MyPages() {
         </div>
       )}
 
-      <Modal
-        isOpen={isCreateOpen && !!ownerId}
-        onClose={() => setIsCreateOpen(false)}
-        title="New page"
-      >
+      <Modal isOpen={isCreateOpen && !!ownerId} onClose={() => setIsCreateOpen(false)} title="New page">
         {ownerId && (
-          <CreatePageForm
-            ownerId={ownerId}
-            onCreated={handlePageCreated}
-            onCancel={() => setIsCreateOpen(false)}
-          />
+          <CreatePageForm ownerId={ownerId} onCreated={handlePageCreated} onCancel={() => setIsCreateOpen(false)} />
         )}
       </Modal>
 
@@ -189,9 +172,7 @@ export default function MyPages() {
         description={
           pageToDelete && (
             <>
-              Are you sure you want to delete{" "}
-              <strong>{pageToDelete.title}</strong>? This action cannot be
-              undone.
+              Are you sure you want to delete <strong>{pageToDelete.title}</strong>? This action cannot be undone.
             </>
           )
         }

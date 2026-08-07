@@ -71,19 +71,19 @@ const Toolbar = () => {
       onClick={() => {
         showSideBar === false ? setShowSidebar(true) : null;
       }}
-      className={`bg-[var(--background-secondary)] w-60 h-full border-r-2 border-[var(--foreground)]/10 ${showSideBar ? "" : "transform-[translateX(-215px)]"} transition-transform`}
+      className={`bg-(--background-secondary) w-60 h-full border-r-2 border-(--foreground)/10 ${showSideBar ? "" : "transform-[translateX(-215px)]"} transition-transform`}
     >
-      <div className="bg-[var(--foreground)]/10 p-1 flex justify-end">
+      <div className="bg-(--foreground)/10 p-1 flex justify-end">
         <FontAwesomeIcon
           icon={faAnglesLeft}
-          className="text-[var(--foreground)]/80 font-thin text-xs cursor-pointer"
+          className="text-(--foreground)/80 font-thin text-xs cursor-pointer"
           onClick={() => setShowSidebar(!showSideBar)}
         />
       </div>
 
       {!showSideBar && (
         <div className="relative h-full">
-          <button className="absolute text-sm left-full top-1/2 -translate-x-[24px] -rotate-90 origin-top-left whitespace-nowrap cursor-pointer pt-0.5 text-sm">
+          <button className="absolute text-sm left-full top-1/2 -translate-x-6 -rotate-90 origin-top-left whitespace-nowrap cursor-pointer pt-0.5">
             Toolbar
           </button>
         </div>
@@ -93,18 +93,18 @@ const Toolbar = () => {
         <main ref={containerRef} className="flex flex-col h-[calc(100%-20px)]">
           <div
             style={{ height: paletteHeight }}
-            className="flex flex-col shrink-0 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="flex flex-col shrink-0 overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
             <p className="px-2 pt-3">Components</p>
             {!selectedSectionId && (
-              <p className="px-2 pb-1 text-xs text-[var(--foreground)]/40">Select a section to add components.</p>
+              <p className="px-2 pb-1 text-xs text-(--foreground)/40">Select a section to add components.</p>
             )}
             {componentList.map((def) => (
               <button
                 key={def.type}
                 disabled={!selectedSectionId}
                 onClick={() => handleAddComponent(def)}
-                className="flex items-center justify-between gap-1 h-10 m-2 p-2 rounded border-2 border-[var(--foreground)]/10 hover:opacity-80 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex items-center justify-between gap-1 h-10 m-2 p-2 rounded border-2 border-(--foreground)/10 hover:opacity-80 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <span>{def.label}</span>
                 <def.icon size={20} />
@@ -115,13 +115,13 @@ const Toolbar = () => {
           {/* handle de resize */}
           <div
             onMouseDown={handlePointerDown}
-            className="h-1.5 shrink-0 cursor-row-resize flex items-center justify-center border-y-2 border-[var(--foreground)]/10 bg-[var(--foreground)]/10 hover:bg-[var(--foreground)]/20 active:bg-[var(--foreground)]/30 transition-colors"
+            className="h-1.5 shrink-0 cursor-row-resize flex items-center justify-center border-y-2 border-(--foreground)/10 bg-(--foreground)/10 hover:bg-(--foreground)/20 active:bg-(--foreground)/30 transition-colors"
           >
-            <div className="w-8 h-0.5 rounded-full bg-[var(--foreground)]/30" />
+            <div className="w-8 h-0.5 rounded-full bg-(--foreground)/30" />
           </div>
 
           {/* structure */}
-          <div className="flex-1 min-h-0 overflow-y-auto mt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto mt-2 scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <ComponentTree />
           </div>
         </main>

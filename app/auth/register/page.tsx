@@ -15,16 +15,28 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
       <AuthCard>
         <h1 className="text-xl font-bold text-center [font-family:var(--font-press-start-2p)]">Create account</h1>
 
-        <form action={signup} className="flex flex-col gap-2 w-full mt-4 bg-[var(--background-secondary)] p-4 rounded-lg">
+        <form action={signup} className="flex flex-col gap-2 w-full mt-4 bg-(--background-secondary) p-4 rounded-lg">
           <label htmlFor="email" className="font-semibold [font-family:var(--font-press-start-2p)] text-[12px]">
             Email
           </label>
-          <input id="email" name="email" type="email" required className="rounded-lg border p-2 bg-[var(--background-tertiary)]" />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            className="rounded-lg border p-2 bg-(--background-tertiary)"
+          />
 
           <label htmlFor="password" className="font-semibold [font-family:var(--font-press-start-2p)] text-[12px]">
             Password
           </label>
-          <input id="password" name="password" type="password" required className="rounded-lg border p-2 bg-[var(--background-tertiary)]" />
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            className="rounded-lg border p-2 bg-(--background-tertiary)"
+          />
 
           {params.error && <p className="text-red-500 text-sm mt-2">{params.error}</p>}
 

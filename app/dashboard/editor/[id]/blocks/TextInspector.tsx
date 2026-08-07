@@ -24,7 +24,7 @@ const TextInspector = ({ component, sectionId }: TextInspectorProps) => {
             })
           }
           rows={3}
-          className="px-2 py-1 rounded border border-[var(--foreground)]/10 bg-transparent text-sm resize-none"
+          className="px-2 py-1 rounded border border-(--foreground)/10 bg-transparent text-sm resize-none"
         />
       </label>
 
@@ -39,7 +39,7 @@ const TextInspector = ({ component, sectionId }: TextInspectorProps) => {
               attributes: { ...attributes, fontSize: Number(e.target.value) },
             })
           }
-          className="h-8 px-2 rounded border border-[var(--foreground)]/10 bg-transparent text-sm"
+          className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
         />
       </label>
 
@@ -52,7 +52,7 @@ const TextInspector = ({ component, sectionId }: TextInspectorProps) => {
               attributes: { ...attributes, fontWeight: e.target.value },
             })
           }
-          className="h-8 px-2 rounded border border-[var(--foreground)]/10 bg-transparent text-sm"
+          className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
         >
           <option value="normal">Normal</option>
           <option value="bold">Bold</option>
@@ -68,7 +68,7 @@ const TextInspector = ({ component, sectionId }: TextInspectorProps) => {
               attributes: { ...attributes, align: e.target.value },
             })
           }
-          className="h-8 px-2 rounded border border-[var(--foreground)]/10 bg-transparent text-sm"
+          className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
         >
           <option value="left">Left</option>
           <option value="center">Center</option>
@@ -86,7 +86,7 @@ const TextInspector = ({ component, sectionId }: TextInspectorProps) => {
               colors: { ...colors, text: e.target.value },
             })
           }
-          className="h-8 w-full cursor-pointer rounded border border-[var(--foreground)]/10"
+          className="h-8 w-full cursor-pointer rounded border border-(--foreground)/10"
         />
       </label>
     </div>

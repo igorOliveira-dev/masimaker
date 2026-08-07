@@ -34,18 +34,18 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = "ma
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div
-        className={`bg-[var(--background)] rounded-lg p-6 w-full ${maxWidth} relative`}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div
+      className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      onClick={onClose}
+    >
+      <div className={`bg-background rounded-lg p-6 w-full ${maxWidth} relative`} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           {title && <h2 className="text-lg font-semibold">{title}</h2>}
 
           <button
             onClick={onClose}
             aria-label="Fechar"
-            className="cursor-pointer w-8 h-8 flex items-center justify-center hover:bg-[var(--foreground)]/10 rounded-full transition-colors"
+            className="cursor-pointer w-8 h-8 flex items-center justify-center hover:bg-(--foreground)/10 rounded-full transition-colors"
           >
             ✕
           </button>

@@ -58,7 +58,7 @@ export default function ConfirmModal({
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="cursor-pointer flex-1 bg-[var(--background-secondary)] hover:opacity-80 transition-opacity rounded-md px-4 py-2 font-medium disabled:opacity-50"
+            className="cursor-pointer flex-1 bg-(--background-secondary) hover:opacity-80 transition-opacity rounded-md px-4 py-2 font-medium disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -67,7 +67,7 @@ export default function ConfirmModal({
             onClick={handleConfirm}
             disabled={loading}
             className={`cursor-pointer flex-1 ${
-              danger ? "bg-red-600" : "bg-[var(--purple)]"
+              danger ? "bg-red-600" : "bg-(--purple)"
             } hover:opacity-80 transition-opacity text-white rounded-md px-4 py-2 font-medium disabled:opacity-50`}
           >
             {loading ? "Wait..." : confirmLabel}

@@ -64,22 +64,22 @@ export default function QrCodeModal({ isOpen, onClose, slug }: QrCodeModalProps)
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Access the page" maxWidth="max-w-sm">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-full flex items-center justify-center bg-white rounded-lg p-4 border-2 border-[var(--foreground)]/10">
+        <div className="w-full flex items-center justify-center bg-white rounded-lg p-4 border-2 border-(--foreground)/10">
           {qrDataUrl ? (
             <img src={qrDataUrl} alt={`QR code de ${pageUrl}`} className="w-48 h-48" />
           ) : (
-            <div className="w-48 h-48 flex items-center justify-center text-sm text-[var(--foreground)]/60">
+            <div className="w-48 h-48 flex items-center justify-center text-sm text-(--foreground)/60">
               Generating QR code...
             </div>
           )}
         </div>
 
-        <p className="text-sm text-[var(--foreground)]/80 break-all text-center">{pageUrl}</p>
+        <p className="text-sm text-(--foreground)/80 break-all text-center">{pageUrl}</p>
 
         <div className="w-full flex flex-col gap-2">
           <button
             onClick={handleCopyLink}
-            className="cursor-pointer w-full flex items-center justify-center gap-2 p-2 rounded-lg border-2 border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10 transition-colors"
+            className="cursor-pointer w-full flex items-center justify-center gap-2 p-2 rounded-lg border-2 border-(--foreground)/10 hover:bg-(--foreground)/10 transition-colors"
           >
             {copied ? <Check size={18} /> : <Copy size={18} />}
             {copied ? "Link copied!" : "Copy link"}
@@ -88,7 +88,7 @@ export default function QrCodeModal({ isOpen, onClose, slug }: QrCodeModalProps)
           <button
             onClick={handleDownload}
             disabled={!qrDataUrl}
-            className="cursor-pointer w-full flex items-center justify-center gap-2 p-2 rounded-lg border-2 border-[var(--foreground)]/10 hover:bg-[var(--foreground)]/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="cursor-pointer w-full flex items-center justify-center gap-2 p-2 rounded-lg border-2 border-(--foreground)/10 hover:bg-(--foreground)/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Download size={18} />
             Download QR code
@@ -96,7 +96,7 @@ export default function QrCodeModal({ isOpen, onClose, slug }: QrCodeModalProps)
 
           <button
             onClick={handleAccess}
-            className="cursor-pointer w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-[var(--foreground)] text-[var(--background)] hover:opacity-80 transition-opacity"
+            className="cursor-pointer w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-foreground text-background hover:opacity-80 transition-opacity"
           >
             <ExternalLink size={18} />
             Access page

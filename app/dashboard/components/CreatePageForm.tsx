@@ -102,7 +102,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
           placeholder="Eg.: My portfolio"
-          className="bg-[var(--background-secondary)] border border-[var(--foreground)]/20 rounded-md px-3 py-2 outline-none"
+          className="bg-(--background-secondary) border border-(--foreground)/20 rounded-md px-3 py-2 outline-none"
         />
       </div>
 
@@ -110,7 +110,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
         <label htmlFor="slug" className="text-sm font-medium">
           Page address
         </label>
-        <div className="flex items-center bg-[var(--background-secondary)] border border-[var(--foreground)]/20 rounded-md overflow-hidden">
+        <div className="flex items-center bg-(--background-secondary) border border-(--foreground)/20 rounded-md overflow-hidden">
           <input
             id="slug"
             type="text"
@@ -119,7 +119,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
             placeholder="my-portfolio"
             className="flex-1 px-3 py-2 outline-none"
           />
-          <span className="px-3 py-2 mr-0.5 text-sm bg-[var(--foreground)]/10 rounded-r-sm whitespace-nowrap">
+          <span className="px-3 py-2 mr-0.5 text-sm bg-(--foreground)/10 rounded-r-sm whitespace-nowrap">
             .masimaker.com
           </span>
         </div>
@@ -133,7 +133,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="cursor-pointer flex-1 bg-[var(--background-secondary)] hover:opacity-80 transition-opacity rounded-md px-4 py-2 font-medium disabled:opacity-50"
+            className="cursor-pointer flex-1 bg-(--background-secondary) hover:opacity-80 transition-opacity rounded-md px-4 py-2 font-medium disabled:opacity-50"
           >
             Cancel
           </button>
@@ -141,7 +141,7 @@ export default function CreatePageForm({ ownerId, onCreated, onCancel }: CreateP
         <button
           type="submit"
           disabled={loading}
-          className="cursor-pointer flex-1 bg-[var(--purple)] hover:opacity-80 transition-opacity text-white rounded-md px-4 py-2 font-medium disabled:opacity-50"
+          className="cursor-pointer flex-1 bg-(--purple) hover:opacity-80 transition-opacity text-white rounded-md px-4 py-2 font-medium disabled:opacity-50"
         >
           {loading ? "Creating..." : "Create page"}
         </button>

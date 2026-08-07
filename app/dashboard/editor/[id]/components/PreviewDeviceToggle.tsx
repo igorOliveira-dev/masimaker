@@ -18,7 +18,7 @@ export default function PreviewDeviceToggle() {
   const setPreviewDevice = useEditorStore((s) => s.setPreviewDevice);
 
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-[var(--foreground)]/10 p-1">
+    <div className="flex items-center gap-1 rounded-lg border border-(--foreground)/10 p-1">
       {options.map(({ value, icon: Icon, label }) => (
         <button
           key={value}
@@ -26,9 +26,7 @@ export default function PreviewDeviceToggle() {
           title={label}
           onClick={() => setPreviewDevice(value)}
           className={`cursor-pointer p-1.5 rounded-md transition-colors ${
-            previewDevice === value
-              ? "bg-[var(--purple)] text-white"
-              : "hover:bg-[var(--foreground)]/10 text-[var(--foreground)]/70"
+            previewDevice === value ? "bg-(--purple) text-white" : "hover:bg-(--foreground)/10 text-(--foreground)/70"
           }`}
         >
           <Icon size={16} />
