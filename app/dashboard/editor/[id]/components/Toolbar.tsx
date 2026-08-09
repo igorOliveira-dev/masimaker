@@ -3,16 +3,15 @@
 import { faAnglesLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { componentList } from "../blocks/index";
 import { useEditorStore } from "@/app/stores/editorStore";
 import ComponentTree from "./ComponentTree";
+import ComponentPalette from "./ComponentPalette";
 
 const MIN_PALETTE_HEIGHT = 120;
 const MIN_TREE_HEIGHT = 120;
 
 const Toolbar = () => {
   const sections = useEditorStore((s) => s.sections);
-  const addComponent = useEditorStore((s) => s.addComponent);
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
   const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const [showSideBar, setShowSidebar] = useState(true);
@@ -23,11 +22,6 @@ const Toolbar = () => {
 
   const section = sections.find((s) => s.id === selectedSectionId);
   const component = section?.components.find((c) => c.id === selectedComponentId);
-
-  function handleAddComponent(def: (typeof componentList)[number]) {
-    if (!selectedSectionId) return;
-    addComponent(def, selectedSectionId);
-  }
 
   const handlePointerMove = useCallback((e: MouseEvent) => {
     if (!isDraggingRef.current || !containerRef.current) return;
@@ -93,23 +87,9 @@ const Toolbar = () => {
         <main ref={containerRef} className="flex flex-col h-[calc(100%-20px)]">
           <div
             style={{ height: paletteHeight }}
-            className="flex flex-col shrink-0 overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            className="shrink-0 overflow-y-auto scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
-            <p className="px-2 pt-3">Components</p>
-            {!selectedSectionId && (
-              <p className="px-2 pb-1 text-xs text-(--foreground)/40">Select a section to add components.</p>
-            )}
-            {componentList.map((def) => (
-              <button
-                key={def.type}
-                disabled={!selectedSectionId}
-                onClick={() => handleAddComponent(def)}
-                className="flex items-center justify-between gap-1 h-10 m-2 p-2 rounded border-2 border-(--foreground)/10 hover:opacity-80 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <span>{def.label}</span>
-                <def.icon size={20} />
-              </button>
-            ))}
+            <ComponentPalette />
           </div>
 
           {/* handle de resize */}
