@@ -66,7 +66,9 @@ const PagePreview = () => {
                 }}
                 onClick={() => selectSection(section.id)}
                 className={`w-full relative cursor-pointer transition-colors ${
-                  isSelected ? "outline outline-blue-500 z-1" : "hover:outline hover:outline-(--foreground)/20"
+                  isSelected
+                    ? "outline-2 outline-blue-500 z-1 -outline-offset-2"
+                    : "hover:outline hover:outline-(--foreground)/20"
                 }`}
                 style={{
                   backgroundColor: section.background ?? undefined,
