@@ -11,13 +11,26 @@ const ComponentTree = () => {
   const sections = useEditorStore((s) => s.sections);
   const addSection = useEditorStore((s) => s.addSection);
   const reorderSections = useEditorStore((s) => s.reorderSections);
-  const moveComponent = useEditorStore((s) => s.moveComponent);
+  const moveComponentTo = useEditorStore((s) => s.moveComponentTo);
+  const snapshotHistory = useEditorStore((s) => s.snapshotHistory);
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
   function toggleCollapse(sectionId: string) {
     setCollapsed((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
   }
+
+  const handleDragStart: React.ComponentProps<typeof DragDropProvider>["onDragStart"] = ({ operation }) => {
+    if (isSortable(operation.source)) snapshotHistory();
+  };
+
+  const handleDragOver: React.ComponentProps<typeof DragDropProvider>["onDragOver"] = ({ operation }) => {
+    const { source } = operation;
+    if (!isSortable(source) || source.type !== "component") return;
+
+    const { group, index } = source as typeof source & { group: string };
+    moveComponentTo(source.id as string, group, index);
+  };
 
   const handleDragEnd: React.ComponentProps<typeof DragDropProvider>["onDragEnd"] = ({ operation, canceled }) => {
     if (canceled) return;
@@ -27,21 +40,8 @@ const ComponentTree = () => {
     if (source.type === "section") {
       const { initialIndex, index } = source;
       reorderSections(initialIndex, index);
-      return;
     }
-
-    if (source.type === "component") {
-      const { group, initialGroup, index, initialIndex } = source as typeof source & {
-        group: string;
-        initialGroup: string;
-      };
-      moveComponent({
-        fromSectionId: initialGroup,
-        toSectionId: group,
-        fromIndex: initialIndex,
-        toIndex: index,
-      });
-    }
+    // componentes já foram movidos em tempo real pelo onDragOver — nada a fazer aqui
   };
 
   if (sections.length === 0) {
@@ -72,7 +72,7 @@ const ComponentTree = () => {
         </button>
       </div>
 
-      <DragDropProvider onDragEnd={handleDragEnd}>
+      <DragDropProvider onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
         {sections.map((section, sectionIndex) => (
           <SortableSection
             key={section.id}

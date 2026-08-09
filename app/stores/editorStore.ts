@@ -52,7 +52,8 @@ interface EditorState {
   setPage: (page: PageData) => void;
   setSections: (sections: SectionItem[]) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
-  moveComponent: (params: { fromSectionId: string; toSectionId: string; fromIndex: number; toIndex: number }) => void;
+  snapshotHistory: () => void;
+  moveComponentTo: (componentId: string, toSectionId: string, toIndex: number) => void;
 
   addSection: (options?: { background?: string; height?: number }) => void; // na interface EditorState, adicione:
   updateSection: (sectionId: string, patch: Partial<Omit<SectionItem, "id" | "components">>) => void;
@@ -230,20 +231,32 @@ export const useEditorStore = create<EditorState>((set, get) => {
       });
     },
 
-    moveComponent: ({ fromSectionId, toSectionId, fromIndex, toIndex }) => {
-      if (fromSectionId === toSectionId && fromIndex === toIndex) return;
+    snapshotHistory: () => {
       pushHistory();
+    },
+
+    moveComponentTo: (componentId, toSectionId, toIndex) => {
       set((state) => {
-        const sections = state.sections.map((s) => ({
-          ...s,
-          components: [...s.components],
-        }));
-        const fromSection = sections.find((s) => s.id === fromSectionId);
+        const sections = state.sections.map((s) => ({ ...s, components: [...s.components] }));
+
+        let fromSection: SectionItem | undefined;
+        let fromIndex = -1;
+        for (const s of sections) {
+          const idx = s.components.findIndex((c) => c.id === componentId);
+          if (idx !== -1) {
+            fromSection = s;
+            fromIndex = idx;
+            break;
+          }
+        }
+        if (!fromSection) return state;
+
         const toSection = sections.find((s) => s.id === toSectionId);
-        if (!fromSection || !toSection) return state;
+        if (!toSection) return state;
 
         const [moved] = fromSection.components.splice(fromIndex, 1);
-        toSection.components.splice(toIndex, 0, moved);
+        const clampedIndex = Math.max(0, Math.min(toIndex, toSection.components.length));
+        toSection.components.splice(clampedIndex, 0, moved);
 
         fromSection.components = fromSection.components.map((c, i) => ({ ...c, position: i }));
         toSection.components = toSection.components.map((c, i) => ({ ...c, position: i }));
