@@ -27,6 +27,11 @@ export default function MyPages() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Estado para o modal de confirmação de exclusão
   const [pageToDelete, setPageToDelete] = useState<PageItem | null>(null);
@@ -94,7 +99,8 @@ export default function MyPages() {
           <ThemeToggleButton />
           <button
             onClick={() => ownerId && setIsCreateOpen(true)}
-            disabled={!ownerId}
+            disabled={!mounted || !ownerId}
+            suppressHydrationWarning
             className="cursor-pointer p-1 px-4 bg-(--purple) border-2 rounded-lg  border-(--foreground)/10 hover:opacity-80 transition-opacity"
           >
             <span className="font-semibold text-white">+ Create new page</span>
