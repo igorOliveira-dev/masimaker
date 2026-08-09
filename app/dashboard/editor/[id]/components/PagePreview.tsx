@@ -14,7 +14,9 @@ const DEVICE_WIDTHS: Record<string, string> = {
 const PagePreview = () => {
   const sections = useEditorStore((s) => s.sections);
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
+  const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectSection = useEditorStore((s) => s.selectSection);
+  const selectComponent = useEditorStore((s) => s.selectComponent);
   const updateSection = useEditorStore((s) => s.updateSection);
   const previewDevice = useEditorStore((s) => s.previewDevice);
 
@@ -56,7 +58,8 @@ const PagePreview = () => {
           className={`mx-auto flex flex-col transition-[max-width] duration-300 ease-in-out rounded overflow-hidden ${DEVICE_WIDTHS[previewDevice]}`}
         >
           {sections.map((section) => {
-            const isSelected = selectedSectionId === section.id;
+            const isSelectedSection = selectedSectionId === section.id;
+            const hasSelectedComponent = section.components.some((component) => component.id === selectedComponentId);
 
             return (
               <div
@@ -65,9 +68,9 @@ const PagePreview = () => {
                   sectionRefs.current[section.id] = el;
                 }}
                 onClick={() => selectSection(section.id)}
-                className={`w-full relative cursor-pointer transition-colors ${
-                  isSelected
-                    ? "outline-2 outline-blue-500 z-1 -outline-offset-2"
+                className={`relative w-full cursor-pointer transition-colors ${
+                  isSelectedSection && !hasSelectedComponent
+                    ? "z-10 outline-2 outline-blue-500 -outline-offset-2"
                     : "hover:outline hover:outline-(--foreground)/20"
                 }`}
                 style={{
@@ -80,15 +83,33 @@ const PagePreview = () => {
                       const def = componentRegistry[component.type as keyof typeof componentRegistry];
                       if (!def) return null;
                       const { Component } = def;
-                      return <Component key={component.id} component={component} />;
+                      const isSelectedComponent = component.id === selectedComponentId;
+
+                      return (
+                        <div
+                          key={component.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            selectComponent(section.id, component.id);
+                          }}
+                          className={
+                            isSelectedComponent ? "relative z-10 outline-2 outline-blue-500 -outline-offset-2" : ""
+                          }
+                        >
+                          <Component component={component} />
+                        </div>
+                      );
                     })
                   : null}
 
                 <div
-                  onMouseDown={(e) => handleResizeStart(e, section.id)}
-                  className="absolute bottom-0 left-0 w-full h-2 cursor-row-resize flex items-center justify-center group"
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    handleResizeStart(e, section.id);
+                  }}
+                  className="absolute bottom-0 left-0 flex h-2 w-full cursor-row-resize items-center justify-center group"
                 >
-                  <div className="w-16 h-1 rounded-full bg-(--foreground)/20 group-hover:bg-(--foreground)/40 transition-colors" />
+                  <div className="h-1 w-16 rounded-full bg-(--foreground)/20 transition-colors group-hover:bg-(--foreground)/40" />
                 </div>
               </div>
             );
