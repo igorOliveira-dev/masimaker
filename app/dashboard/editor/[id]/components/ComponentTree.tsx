@@ -62,7 +62,7 @@ const ComponentTree = () => {
 
   return (
     <div className="flex flex-col gap-1 px-2">
-      <div className="flex items-center justify-between mb-3">
+      <div className="sticky top-0 z-10 bg-(--background-secondary) flex items-center justify-between mb-3 py-1">
         <p className="text-sm">Structure</p>
         <button
           onClick={() => addSection()}

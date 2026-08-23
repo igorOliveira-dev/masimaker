@@ -13,6 +13,7 @@ export interface ComponentItem {
 
 export interface SectionItem {
   id: string;
+  name?: string | null;
   background?: string | null;
   colors?: Record<string, any> | null;
   height?: number | null;
@@ -316,6 +317,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
               .from("sections")
               .insert({
                 page_id: page.id,
+                name: section.name,
                 background: section.background,
                 colors: section.colors,
                 height: section.height,
@@ -330,6 +332,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
             await supabase
               .from("sections")
               .update({
+                name: section.name,
                 background: section.background,
                 colors: section.colors,
                 height: section.height,

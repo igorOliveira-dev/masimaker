@@ -22,7 +22,7 @@ html[data-theme='dark'] {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-roboto: var(--font-roboto);
-  --font-press-start: var(--font-press-start-2p);
+  --font-departure-mono: var(--font-departure-mono);
 }
 
 body {

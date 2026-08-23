@@ -9,15 +9,15 @@ const roboto = Roboto({
   subsets: ["latin"],
 });
 
-const pressStart2p = localFont({
+const departureMono = localFont({
   src: [
     {
-      path: "../public/fonts/PressStart2P.ttf",
+      path: "../public/fonts/DepartureMono-Regular.woff2",
       weight: "400",
       style: "normal",
     },
   ],
-  variable: "--font-press-start-2p",
+  variable: "--font-departure-mono",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${roboto.variable} ${pressStart2p.variable} h-full antialiased`}>
+    <html lang="en" className={`${roboto.variable} ${departureMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
