@@ -2,10 +2,12 @@
 
 import { ChevronDown, ChevronRight, LayoutPanelTop } from "lucide-react";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { useEditorStore, type SectionItem } from "@/app/stores/editorStore";
 import { componentRegistry } from "../blocks";
 import ActionsMenu from "../../../components/ActionsMenu";
+import ConfirmModal from "../../../components/ConfirmModal";
 import { SortableComponent } from "./SortableComponent";
 
 type Props = {
@@ -20,6 +22,8 @@ export function SortableSection({ section, index, isOpen, onToggleCollapse }: Pr
   const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectSection = useEditorStore((s) => s.selectSection);
   const removeSection = useEditorStore((s) => s.removeSection);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { ref, isDragging } = useSortable({
     id: section.id,
@@ -59,11 +63,21 @@ export function SortableSection({ section, index, isOpen, onToggleCollapse }: Pr
           <ActionsMenu
             options={[
               { label: "Edit", icon: faPen, onClick: () => selectSection(section.id) },
-              { label: "Delete", icon: faTrash, danger: true, onClick: () => removeSection(section.id) },
+              { label: "Delete", icon: faTrash, danger: true, onClick: () => setIsDeleteModalOpen(true) },
             ]}
           />
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => removeSection(section.id)}
+        title="Delete section"
+        description={`Are you sure you want to delete "${section.name || `Section ${index + 1}`}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        danger
+      />
 
       {isOpen && (
         <div className="flex flex-col ml-6 border-l border-(--foreground)/10 pl-2">
