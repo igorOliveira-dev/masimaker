@@ -1,10 +1,12 @@
 "use client";
 
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { useEditorStore, type ComponentItem } from "@/app/stores/editorStore";
 import { componentRegistry } from "../blocks";
 import ActionsMenu from "../../../components/ActionsMenu";
+import ConfirmModal from "../../../components/ConfirmModal";
 
 type Props = {
   component: ComponentItem;
@@ -16,6 +18,8 @@ export function SortableComponent({ component, index, sectionId }: Props) {
   const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectComponent = useEditorStore((s) => s.selectComponent);
   const removeComponent = useEditorStore((s) => s.removeComponent);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const { ref, isDragging } = useSortable({
     id: component.id,
@@ -48,10 +52,20 @@ export function SortableComponent({ component, index, sectionId }: Props) {
         <ActionsMenu
           options={[
             { label: "Edit", icon: faPen, onClick: () => selectComponent(sectionId, component.id) },
-            { label: "Delete", icon: faTrash, danger: true, onClick: () => removeComponent(sectionId, component.id) },
+            { label: "Delete", icon: faTrash, danger: true, onClick: () => setIsDeleteModalOpen(true) },
           ]}
         />
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => removeComponent(sectionId, component.id)}
+        title="Delete component"
+        description={`Are you sure you want to delete "${def?.label ?? component.type}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        danger
+      />
     </div>
   );
 }
