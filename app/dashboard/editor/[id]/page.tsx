@@ -30,7 +30,7 @@ export default function EditorPage() {
     const { data: sectionsData, error: sectionsError } = await supabase
       .from("sections")
       .select(
-        "id, background, colors, height, position, components (id, type, colors, attributes, position)",
+        "id, name, background, colors, height, position, components (id, type, colors, attributes, position)",
       )
       .eq("page_id", pageId)
       .order("position", { ascending: true });

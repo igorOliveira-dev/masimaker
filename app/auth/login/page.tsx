@@ -17,10 +17,10 @@ export default async function LoginPage({
         <ThemeToggleButton />
       </div>
       <AuthCard>
-        <h1 className="text-xl font-bold text-center [font-family:var(--font-press-start-2p)]">Login</h1>
+        <h1 className="text-xl font-bold text-center [font-family:var(--font-departure-mono)]">Login</h1>
 
         <form action={login} className="flex flex-col gap-2 w-full mt-4 bg-(--background-secondary) p-4 rounded-lg">
-          <label htmlFor="email" className="font-semibold [font-family:var(--font-press-start-2p)] text-[12px]">
+          <label htmlFor="email" className="font-semibold [font-family:var(--font-departure-mono)] text-[12px]">
             Email
           </label>
           <input
@@ -31,7 +31,7 @@ export default async function LoginPage({
             className="rounded-lg border p-2 bg-(--background-tertiary)"
           />
 
-          <label htmlFor="password" className="font-semibold [font-family:var(--font-press-start-2p)] text-[12px]">
+          <label htmlFor="password" className="font-semibold [font-family:var(--font-departure-mono)] text-[12px]">
             Password
           </label>
           <input
@@ -48,7 +48,7 @@ export default async function LoginPage({
           <SubmitButton>Log in</SubmitButton>
         </form>
 
-        <p className="mt-4 text-sm text-center [font-family:var(--font-press-start-2p)] text-[9px] tracking-tight">
+        <p className="mt-4 text-sm text-center [font-family:var(--font-departure-mono)] text-[9px] tracking-tight">
           New to Masi Maker?{" "}
           <Link href="/auth/register" className="text-blue-500 hover:underline">
             Create an account

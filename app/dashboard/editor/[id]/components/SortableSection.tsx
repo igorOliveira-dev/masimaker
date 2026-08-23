@@ -50,7 +50,7 @@ export function SortableSection({ section, index, isOpen, onToggleCollapse }: Pr
 
         <LayoutPanelTop size={14} className="shrink-0 opacity-70" />
 
-        <span className="text-sm truncate flex-1">Section {index + 1}</span>
+        <span className="text-sm truncate flex-1">{section.name || `Section ${index + 1}`}</span>
 
         <div
           onClick={(e) => e.stopPropagation()}

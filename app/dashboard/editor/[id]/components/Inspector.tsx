@@ -80,6 +80,17 @@ const Inspector = () => {
                 </div>
 
                 <label className="flex flex-col gap-1 text-xs">
+                  Name
+                  <input
+                    type="text"
+                    value={section.name ?? ""}
+                    onChange={(e) => updateSection(section.id, { name: e.target.value })}
+                    placeholder="Section name"
+                    className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1 text-xs">
                   Background color
                   <input
                     type="color"

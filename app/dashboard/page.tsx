@@ -94,7 +94,7 @@ export default function MyPages() {
   return (
     <div className="max-w-270 w-full mx-auto px-4 py-8 pt-28">
       <header className=" top-0 left-0 w-full bg-(--background-secondary)/50 backdrop-blur-sm fixed flex items-center justify-between px-6 py-5 md:px-12 z-1">
-        <h1 className="text-(--purple) font-press-start text-xl">My Pages</h1>
+        <h1 className="text-(--purple) font-departure-mono text-xl">My Pages</h1>
         <div className="flex items-center gap-2">
           <ThemeToggleButton />
           <button
