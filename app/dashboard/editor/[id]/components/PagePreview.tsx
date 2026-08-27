@@ -2,7 +2,8 @@
 
 import { useRef } from "react";
 import { useEditorStore } from "@/app/stores/editorStore";
-import { componentRegistry } from "../blocks";
+import type { ComponentItem } from "@/app/stores/editorStore";
+import { componentRegistry, isContainer } from "../blocks";
 import PreviewDeviceToggle from "./PreviewDeviceToggle";
 
 const DEVICE_WIDTHS: Record<string, string> = {
@@ -10,6 +11,61 @@ const DEVICE_WIDTHS: Record<string, string> = {
   tablet: "max-w-[768px]",
   desktop: "max-w-[1280px]",
 };
+
+function sortedChildren(components: ComponentItem[], parentId: string | null) {
+  return components
+    .filter((c) => c.parentComponentId === parentId)
+    .sort((a, b) => a.position - b.position);
+}
+
+function RenderedComponent({
+  component,
+  sectionId,
+  allComponents,
+  selectedComponentId,
+  selectComponent,
+}: {
+  component: ComponentItem;
+  sectionId: string;
+  allComponents: ComponentItem[];
+  selectedComponentId: string | null;
+  selectComponent: (sectionId: string, componentId: string | null) => void;
+}) {
+  const def = componentRegistry[component.type as keyof typeof componentRegistry];
+  if (!def) return null;
+
+  const { Component } = def;
+  const isSelected = component.id === selectedComponentId;
+
+  return (
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        selectComponent(sectionId, component.id);
+      }}
+      onClickCapture={(e) => {
+        // impede navegação real ao clicar em links/botões enquanto edita no canvas
+        if ((e.target as HTMLElement).closest("a")) e.preventDefault();
+      }}
+      className={isSelected ? "relative z-10 outline-2 outline-blue-500 -outline-offset-2" : ""}
+    >
+      <Component component={component}>
+        {isContainer(component.type)
+          ? sortedChildren(allComponents, component.id).map((child) => (
+              <RenderedComponent
+                key={child.id}
+                component={child}
+                sectionId={sectionId}
+                allComponents={allComponents}
+                selectedComponentId={selectedComponentId}
+                selectComponent={selectComponent}
+              />
+            ))
+          : null}
+      </Component>
+    </div>
+  );
+}
 
 const PagePreview = () => {
   const sections = useEditorStore((s) => s.sections);
@@ -79,27 +135,16 @@ const PagePreview = () => {
                 }}
               >
                 {section.components.length > 0
-                  ? section.components.map((component) => {
-                      const def = componentRegistry[component.type as keyof typeof componentRegistry];
-                      if (!def) return null;
-                      const { Component } = def;
-                      const isSelectedComponent = component.id === selectedComponentId;
-
-                      return (
-                        <div
-                          key={component.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            selectComponent(section.id, component.id);
-                          }}
-                          className={
-                            isSelectedComponent ? "relative z-10 outline-2 outline-blue-500 -outline-offset-2" : ""
-                          }
-                        >
-                          <Component component={component} />
-                        </div>
-                      );
-                    })
+                  ? sortedChildren(section.components, null).map((component) => (
+                      <RenderedComponent
+                        key={component.id}
+                        component={component}
+                        sectionId={section.id}
+                        allComponents={section.components}
+                        selectedComponentId={selectedComponentId}
+                        selectComponent={selectComponent}
+                      />
+                    ))
                   : null}
 
                 <div

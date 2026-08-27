@@ -29,7 +29,9 @@ const ComponentTree = () => {
     if (!isSortable(source) || source.type !== "component") return;
 
     const { group, index } = source as typeof source & { group: string };
-    moveComponentTo(source.id as string, group, index);
+    const [toSectionId, parentKey] = group.split("::");
+    const toParentComponentId = parentKey === "root" ? null : parentKey;
+    moveComponentTo(source.id as string, toSectionId, toParentComponentId, index);
   };
 
   const handleDragEnd: React.ComponentProps<typeof DragDropProvider>["onDragEnd"] = ({ operation, canceled }) => {

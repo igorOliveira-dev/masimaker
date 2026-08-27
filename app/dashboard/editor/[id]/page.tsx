@@ -30,7 +30,7 @@ export default function EditorPage() {
     const { data: sectionsData, error: sectionsError } = await supabase
       .from("sections")
       .select(
-        "id, name, background, colors, height, position, components (id, type, colors, attributes, position)",
+        "id, name, background, colors, height, position, components (id, type, colors, attributes, position, parent_component_id)",
       )
       .eq("page_id", pageId)
       .order("position", { ascending: true });
@@ -42,9 +42,12 @@ export default function EditorPage() {
 
     const sorted = (sectionsData ?? []).map((section: any) => ({
       ...section,
-      components: [...(section.components ?? [])].sort(
-        (a: ComponentItem, b: ComponentItem) => a.position - b.position,
-      ),
+      components: [...(section.components ?? [])]
+        .map((c) => ({
+          ...c,
+          parentComponentId: c.parent_component_id ?? null,
+        }))
+        .sort((a: ComponentItem, b: ComponentItem) => a.position - b.position),
     }));
 
     setSections(sorted);
