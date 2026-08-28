@@ -2,11 +2,44 @@
 
 import { ChevronDown, ChevronRight, LayoutPanelTop } from "lucide-react";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { useEditorStore, type SectionItem } from "@/app/stores/editorStore";
-import { componentRegistry } from "../blocks";
+import { useEditorStore, type SectionItem, type ComponentItem } from "@/app/stores/editorStore";
+import { isContainer } from "../blocks";
 import ActionsMenu from "../../../components/ActionsMenu";
-import { SortableComponent } from "./SortableComponent";
+import ConfirmModal from "../../../components/ConfirmModal";
+import { SortableComponent, EmptyContainerSlot } from "./SortableComponent";
+
+type Row =
+  | { kind: "component"; component: ComponentItem; parentComponentId: string | null; index: number; depth: number }
+  | { kind: "empty-slot"; parentComponentId: string; depth: number };
+
+// achata a árvore de componentes num único array (respeitando containers colapsados),
+// pra que mover um componente entre níveis de aninhamento nunca exija desmontar/remontar
+// seu nó do DOM em uma subárvore diferente — o que confunde o drag-and-drop do dnd-kit
+function flattenComponents(
+  components: ComponentItem[],
+  parentComponentId: string | null,
+  depth: number,
+  collapsedIds: Record<string, boolean>,
+  rows: Row[],
+) {
+  const siblings = components
+    .filter((c) => c.parentComponentId === parentComponentId)
+    .sort((a, b) => a.position - b.position);
+
+  siblings.forEach((component, index) => {
+    rows.push({ kind: "component", component, parentComponentId, index, depth });
+
+    if (isContainer(component.type) && !collapsedIds[component.id]) {
+      const before = rows.length;
+      flattenComponents(components, component.id, depth + 1, collapsedIds, rows);
+      if (rows.length === before) {
+        rows.push({ kind: "empty-slot", parentComponentId: component.id, depth: depth + 1 });
+      }
+    }
+  });
+}
 
 type Props = {
   section: SectionItem;
@@ -20,6 +53,16 @@ export function SortableSection({ section, index, isOpen, onToggleCollapse }: Pr
   const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectSection = useEditorStore((s) => s.selectSection);
   const removeSection = useEditorStore((s) => s.removeSection);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [collapsedComponents, setCollapsedComponents] = useState<Record<string, boolean>>({});
+
+  function toggleComponentCollapse(componentId: string) {
+    setCollapsedComponents((prev) => ({ ...prev, [componentId]: !prev[componentId] }));
+  }
+
+  const rows: Row[] = [];
+  flattenComponents(section.components, null, 0, collapsedComponents, rows);
 
   const { ref, isDragging } = useSortable({
     id: section.id,
@@ -59,25 +102,48 @@ export function SortableSection({ section, index, isOpen, onToggleCollapse }: Pr
           <ActionsMenu
             options={[
               { label: "Edit", icon: faPen, onClick: () => selectSection(section.id) },
-              { label: "Delete", icon: faTrash, danger: true, onClick: () => removeSection(section.id) },
+              { label: "Delete", icon: faTrash, danger: true, onClick: () => setIsDeleteModalOpen(true) },
             ]}
           />
         </div>
       </div>
 
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => removeSection(section.id)}
+        title="Delete section"
+        description={`Are you sure you want to delete "${section.name || `Section ${index + 1}`}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        danger
+      />
+
       {isOpen && (
         <div className="flex flex-col ml-6 border-l border-(--foreground)/10 pl-2">
-          {section.components.length === 0 ? (
+          {rows.length === 0 ? (
             <p className="text-xs text-(--foreground)/30 py-1">Empty</p>
           ) : (
-            section.components.map((component, componentIndex) => (
-              <SortableComponent
-                key={component.id}
-                component={component}
-                index={componentIndex}
-                sectionId={section.id}
-              />
-            ))
+            rows.map((row) =>
+              row.kind === "component" ? (
+                <SortableComponent
+                  key={row.component.id}
+                  component={row.component}
+                  index={row.index}
+                  sectionId={section.id}
+                  parentComponentId={row.parentComponentId}
+                  depth={row.depth}
+                  isCollapsed={!!collapsedComponents[row.component.id]}
+                  onToggleCollapse={() => toggleComponentCollapse(row.component.id)}
+                />
+              ) : (
+                <EmptyContainerSlot
+                  key={`empty-${row.parentComponentId}`}
+                  sectionId={section.id}
+                  parentComponentId={row.parentComponentId}
+                  depth={row.depth}
+                />
+              ),
+            )
           )}
         </div>
       )}

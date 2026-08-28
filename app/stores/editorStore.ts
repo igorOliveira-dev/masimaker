@@ -9,6 +9,7 @@ export interface ComponentItem {
   colors: Record<string, any>;
   attributes: Record<string, any>;
   position: number;
+  parentComponentId: string | null;
 }
 
 export interface SectionItem {
@@ -54,12 +55,17 @@ interface EditorState {
   setSections: (sections: SectionItem[]) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
   snapshotHistory: () => void;
-  moveComponentTo: (componentId: string, toSectionId: string, toIndex: number) => void;
+  moveComponentTo: (
+    componentId: string,
+    toSectionId: string,
+    toParentComponentId: string | null,
+    toIndex: number,
+  ) => void;
 
   addSection: (options?: { background?: string; height?: number }) => void; // na interface EditorState, adicione:
   updateSection: (sectionId: string, patch: Partial<Omit<SectionItem, "id" | "components">>) => void;
   removeSection: (sectionId: string) => void;
-  addComponent: (def: ComponentDefLike, sectionId: string) => void;
+  addComponent: (def: ComponentDefLike, sectionId: string, parentComponentId?: string | null) => void;
   removeComponent: (sectionId: string, componentId: string) => void;
   updateComponent: (sectionId: string, componentId: string, patch: Partial<ComponentItem>) => void;
 
@@ -151,26 +157,27 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }));
     },
 
-    addComponent: (def, sectionId) => {
+    addComponent: (def, sectionId, parentComponentId = null) => {
       pushHistory();
       set((state) => ({
-        sections: state.sections.map((s) =>
-          s.id === sectionId
-            ? {
-                ...s,
-                components: [
-                  ...s.components,
-                  {
-                    id: `temp-${crypto.randomUUID()}`,
-                    type: def.type,
-                    attributes: structuredClone(def.defaultAttributes),
-                    colors: structuredClone(def.defaultColors),
-                    position: s.components.length,
-                  },
-                ],
-              }
-            : s,
-        ),
+        sections: state.sections.map((s) => {
+          if (s.id !== sectionId) return s;
+          const siblings = s.components.filter((c) => c.parentComponentId === parentComponentId);
+          return {
+            ...s,
+            components: [
+              ...s.components,
+              {
+                id: `temp-${crypto.randomUUID()}`,
+                type: def.type,
+                attributes: structuredClone(def.defaultAttributes),
+                colors: structuredClone(def.defaultColors),
+                position: siblings.length,
+                parentComponentId,
+              },
+            ],
+          };
+        }),
         isDirty: true,
       }));
     },
@@ -178,14 +185,32 @@ export const useEditorStore = create<EditorState>((set, get) => {
     removeComponent: (sectionId, componentId) => {
       pushHistory();
       set((state) => ({
-        sections: state.sections.map((s) =>
-          s.id === sectionId
-            ? {
-                ...s,
-                components: s.components.filter((c) => c.id !== componentId),
+        sections: state.sections.map((s) => {
+          if (s.id !== sectionId) return s;
+
+          const idsToRemove = new Set<string>([componentId]);
+          let grew = true;
+          while (grew) {
+            grew = false;
+            for (const c of s.components) {
+              if (c.parentComponentId && idsToRemove.has(c.parentComponentId) && !idsToRemove.has(c.id)) {
+                idsToRemove.add(c.id);
+                grew = true;
               }
-            : s,
-        ),
+            }
+          }
+
+          const removed = s.components.find((c) => c.id === componentId);
+          const remaining = s.components.filter((c) => !idsToRemove.has(c.id));
+          const siblingScope = removed?.parentComponentId ?? null;
+
+          let siblingIndex = 0;
+          const components = remaining.map((c) =>
+            c.parentComponentId === siblingScope ? { ...c, position: siblingIndex++ } : c,
+          );
+
+          return { ...s, components };
+        }),
         isDirty: true,
       }));
     },
@@ -236,7 +261,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       pushHistory();
     },
 
-    moveComponentTo: (componentId, toSectionId, toIndex) => {
+    moveComponentTo: (componentId, toSectionId, toParentComponentId, toIndex) => {
       set((state) => {
         const sections = state.sections.map((s) => ({ ...s, components: [...s.components] }));
 
@@ -255,12 +280,42 @@ export const useEditorStore = create<EditorState>((set, get) => {
         const toSection = sections.find((s) => s.id === toSectionId);
         if (!toSection) return state;
 
-        const [moved] = fromSection.components.splice(fromIndex, 1);
-        const clampedIndex = Math.max(0, Math.min(toIndex, toSection.components.length));
-        toSection.components.splice(clampedIndex, 0, moved);
+        // impede que um componente seja solto dentro de si mesmo ou de um descendente seu
+        if (toParentComponentId) {
+          if (toParentComponentId === componentId) return state;
+          let ancestorId: string | null = toParentComponentId;
+          while (ancestorId) {
+            const ancestor = toSection.components.find((c) => c.id === ancestorId);
+            if (!ancestor) break;
+            if (ancestor.id === componentId) return state;
+            ancestorId = ancestor.parentComponentId;
+          }
+        }
 
-        fromSection.components = fromSection.components.map((c, i) => ({ ...c, position: i }));
-        toSection.components = toSection.components.map((c, i) => ({ ...c, position: i }));
+        const [moved] = fromSection.components.splice(fromIndex, 1);
+        const fromParentComponentId = moved.parentComponentId;
+        moved.parentComponentId = toParentComponentId;
+
+        const toSiblings = toSection.components.filter((c) => c.parentComponentId === toParentComponentId);
+        const clampedIndex = Math.max(0, Math.min(toIndex, toSiblings.length));
+
+        // encontra a posição real de inserção dentro do array completo da section,
+        // logo antes do sibling que hoje ocupa clampedIndex no escopo do pai alvo
+        const insertAt =
+          clampedIndex < toSiblings.length
+            ? toSection.components.indexOf(toSiblings[clampedIndex])
+            : toSection.components.length;
+        toSection.components.splice(insertAt, 0, moved);
+
+        const reindexScope = (section: SectionItem, parentId: string | null) => {
+          let i = 0;
+          section.components = section.components.map((c) =>
+            c.parentComponentId === parentId ? { ...c, position: i++ } : c,
+          );
+        };
+
+        reindexScope(fromSection, fromParentComponentId);
+        reindexScope(toSection, toParentComponentId);
 
         return { sections, isDirty: true };
       });
@@ -351,8 +406,19 @@ export const useEditorStore = create<EditorState>((set, get) => {
             await supabase.from("components").delete().eq("id", c.id);
           }
 
+          // insere/atualiza pais antes de filhos, para que o parent_component_id de um
+          // filho com id temporário possa ser resolvido para o id real do pai
+          const orderedComponents = [...section.components].sort((a, b) =>
+            a.parentComponentId === b.parentComponentId ? 0 : a.parentComponentId === null ? -1 : 1,
+          );
+
+          const parentIdMap = new Map<string, string>();
           const resolvedComponents: ComponentItem[] = [];
-          for (const component of section.components) {
+          for (const component of orderedComponents) {
+            const resolvedParentComponentId = component.parentComponentId
+              ? (parentIdMap.get(component.parentComponentId) ?? component.parentComponentId)
+              : null;
+
             if (isTempId(component.id)) {
               const { data, error } = await supabase
                 .from("components")
@@ -362,12 +428,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   colors: component.colors,
                   attributes: component.attributes,
                   position: component.position,
+                  parent_component_id: resolvedParentComponentId,
                 })
                 .select("id")
                 .single();
 
               if (error || !data) throw error;
-              resolvedComponents.push({ ...component, id: data.id });
+              parentIdMap.set(component.id, data.id);
+              resolvedComponents.push({ ...component, id: data.id, parentComponentId: resolvedParentComponentId });
             } else {
               await supabase
                 .from("components")
@@ -375,9 +443,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   colors: component.colors,
                   attributes: component.attributes,
                   position: component.position,
+                  parent_component_id: resolvedParentComponentId,
                 })
                 .eq("id", component.id);
-              resolvedComponents.push(component);
+              resolvedComponents.push({ ...component, parentComponentId: resolvedParentComponentId });
             }
           }
 

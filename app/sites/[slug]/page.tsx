@@ -1,60 +1,36 @@
 import { createClient } from "@/app/utils/supabase/server"; // versão server-side do client
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-
-interface ComponentItem {
-  id: string;
-  type: string;
-  colors: Record<string, string>;
-  attributes: Record<string, any>;
-  position: number;
-}
+import type { ComponentItem } from "@/app/stores/editorStore";
+import { componentRegistry, isContainer } from "@/app/dashboard/editor/[id]/blocks";
 
 interface SectionItem {
   id: string;
   background: string | null;
-  colors: Record<string, string>;
-  height: string | null;
+  height: number | null;
   position: number;
   components: ComponentItem[];
 }
 
-function RenderComponent({ component }: { component: ComponentItem }) {
-  const style = {
-    color: component.colors?.text,
-    backgroundColor: component.colors?.background,
-  };
+function sortedChildren(components: ComponentItem[], parentId: string | null) {
+  return components.filter((c) => c.parentComponentId === parentId).sort((a, b) => a.position - b.position);
+}
 
-  switch (component.type) {
-    case "title":
-      return (
-        <h2 style={style} className="text-2xl font-semibold">
-          {component.attributes?.text ?? ""}
-        </h2>
-      );
-    case "paragraph":
-      return (
-        <p style={style} className="text-base opacity-90">
-          {component.attributes?.text ?? ""}
-        </p>
-      );
-    case "image":
-      return (
-        <img src={component.attributes?.src} alt={component.attributes?.alt ?? ""} className="max-w-full rounded-md" />
-      );
-    case "button":
-      return (
-        <a
-          href={component.attributes?.href ?? "#"}
-          style={style}
-          className="inline-block px-4 py-2 rounded-md font-medium bg-(--purple) text-white"
-        >
-          {component.attributes?.label ?? "Button"}
-        </a>
-      );
-    default:
-      return null;
-  }
+function RenderComponentTree({ component, allComponents }: { component: ComponentItem; allComponents: ComponentItem[] }) {
+  const def = componentRegistry[component.type as keyof typeof componentRegistry];
+  if (!def) return null;
+
+  const { Component } = def;
+
+  return (
+    <Component component={component}>
+      {isContainer(component.type)
+        ? sortedChildren(allComponents, component.id).map((child) => (
+            <RenderComponentTree key={child.id} component={child} allComponents={allComponents} />
+          ))
+        : null}
+    </Component>
+  );
 }
 
 export default async function PublicSitePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -75,32 +51,37 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
 
   const { data: sectionsData } = await supabase
     .from("sections")
-    .select("id, background, colors, height, position, components (id, type, colors, attributes, position)")
+    .select(
+      "id, background, height, position, components (id, type, colors, attributes, position, parent_component_id)",
+    )
     .eq("page_id", page.id)
     .order("position", { ascending: true });
 
-  const sections: SectionItem[] = (sectionsData ?? []).map((section: any) => ({
+  const sections: SectionItem[] = (sectionsData ?? []).map((section) => ({
     ...section,
-    components: [...(section.components ?? [])].sort((a: ComponentItem, b: ComponentItem) => a.position - b.position),
+    components: (section.components ?? []).map((c) => ({
+      ...c,
+      parentComponentId: c.parent_component_id ?? null,
+    })),
   }));
 
   return (
     <div className="w-full">
       {sections.map((section) => (
-        <section
+        <div
           key={section.id}
           style={{
-            background: section.colors?.background ?? section.background ?? undefined,
+            backgroundColor: section.background ?? undefined,
             minHeight: section.height ? `${section.height}px` : undefined,
           }}
-          className="w-full px-4 py-12 flex flex-col gap-4 items-center"
+          className="w-full"
         >
-          <div className="max-w-270 w-full flex flex-col gap-4">
-            {section.components.map((component) => (
-              <RenderComponent key={component.id} component={component} />
+          <div className="max-w-[1280px] mx-auto">
+            {sortedChildren(section.components, null).map((component) => (
+              <RenderComponentTree key={component.id} component={component} allComponents={section.components} />
             ))}
           </div>
-        </section>
+        </div>
       ))}
     </div>
   );
