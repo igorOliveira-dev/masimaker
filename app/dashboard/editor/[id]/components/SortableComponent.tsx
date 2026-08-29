@@ -38,12 +38,18 @@ export function SortableComponent({
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // sem transição: o container e o "Drop here" ficam em grupos diferentes (o container
+  // no grupo do seu próprio pai, o slot no grupo dos filhos dele), então ao passar entre
+  // os dois o dnd-kit fica alternando de grupo-alvo e tentando "abrir espaço" nos dois
+  // lados, animando o container pra longe do slot — sem transição ele só salta direto
+  // pra posição final, sem esse afastamento visual
   const { ref, isDragging } = useSortable({
     id: component.id,
     index,
     group: groupKey(sectionId, parentComponentId),
     type: "component",
     accept: "component",
+    transition: null,
   });
 
   const def = componentRegistry[component.type as keyof typeof componentRegistry];
@@ -109,12 +115,18 @@ export function EmptyContainerSlot({
   parentComponentId: string;
   depth: number;
 }) {
+  // apenas um alvo de drop — nunca uma origem arrastável — pra que "Drop here" não
+  // possa ser reordenado na árvore e se desgrudar do seu container pai. Sem transição
+  // também: como ele é o único "filho" possível de um container vazio, não faz sentido
+  // animá-lo se afastando do container pra "abrir espaço" pra quem está sendo arrastado
   const { ref } = useSortable({
     id: `empty-${parentComponentId}`,
     index: 0,
     group: groupKey(sectionId, parentComponentId),
     type: "component",
     accept: "component",
+    disabled: { draggable: true },
+    transition: null,
   });
 
   return (

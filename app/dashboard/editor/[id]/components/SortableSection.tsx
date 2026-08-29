@@ -3,7 +3,8 @@
 import { ChevronDown, ChevronRight, LayoutPanelTop } from "lucide-react";
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import { useSortable } from "@dnd-kit/react/sortable";
+import { useDragDropMonitor } from "@dnd-kit/react";
+import { isSortable, useSortable } from "@dnd-kit/react/sortable";
 import { useEditorStore, type SectionItem, type ComponentItem } from "@/app/stores/editorStore";
 import { isContainer } from "../blocks";
 import ActionsMenu from "../../../components/ActionsMenu";
@@ -46,20 +47,50 @@ type Props = {
   index: number;
   isOpen: boolean;
   onToggleCollapse: () => void;
+  collapsedComponents: Record<string, boolean>;
+  setCollapsedComponents: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 };
 
-export function SortableSection({ section, index, isOpen, onToggleCollapse }: Props) {
+export function SortableSection({
+  section,
+  index,
+  isOpen,
+  onToggleCollapse,
+  collapsedComponents,
+  setCollapsedComponents,
+}: Props) {
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
   const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectSection = useEditorStore((s) => s.selectSection);
   const removeSection = useEditorStore((s) => s.removeSection);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [collapsedComponents, setCollapsedComponents] = useState<Record<string, boolean>>({});
 
   function toggleComponentCollapse(componentId: string) {
     setCollapsedComponents((prev) => ({ ...prev, [componentId]: !prev[componentId] }));
   }
+
+  // se o componente solto virou o próximo sibling logo depois de um container aberto
+  // (ficou fora dele, não dentro), retrai o container de novo
+  useDragDropMonitor({
+    onDragEnd: ({ operation, canceled }) => {
+      if (canceled) return;
+      const { source } = operation;
+      if (!isSortable(source) || source.type !== "component") return;
+
+      const dropped = section.components.find((c) => c.id === source.id);
+      if (!dropped) return;
+
+      const precedingSibling = section.components.find(
+        (c) => c.parentComponentId === dropped.parentComponentId && c.position === dropped.position - 1,
+      );
+      if (!precedingSibling || !isContainer(precedingSibling.type) || collapsedComponents[precedingSibling.id]) {
+        return;
+      }
+
+      setCollapsedComponents((prev) => ({ ...prev, [precedingSibling.id]: true }));
+    },
+  });
 
   const rows: Row[] = [];
   flattenComponents(section.components, null, 0, collapsedComponents, rows);

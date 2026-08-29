@@ -1,11 +1,20 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { isSortable } from "@dnd-kit/react/sortable";
-import { useEditorStore } from "@/app/stores/editorStore";
+import { useEditorStore, type SectionItem } from "@/app/stores/editorStore";
+import { isContainer } from "../blocks";
 import { SortableSection } from "./SortableSection";
+
+function findComponentById(sections: SectionItem[], id: string) {
+  for (const section of sections) {
+    const found = section.components.find((c) => c.id === id);
+    if (found) return found;
+  }
+  return null;
+}
 
 const ComponentTree = () => {
   const sections = useEditorStore((s) => s.sections);
@@ -15,6 +24,12 @@ const ComponentTree = () => {
   const snapshotHistory = useEditorStore((s) => s.snapshotHistory);
 
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [collapsedComponents, setCollapsedComponents] = useState<Record<string, boolean>>({});
+
+  // enquanto o cursor ainda está sobre a linha do container que acabou de ser expandido
+  // (por estar colapsado), segura a reordenação — só libera quando o alvo muda pra
+  // outra coisa, ou seja, quando o cursor realmente passa por cima do container
+  const pendingExpandContainerRef = useRef<string | null>(null);
 
   function toggleCollapse(sectionId: string) {
     setCollapsed((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
@@ -25,8 +40,26 @@ const ComponentTree = () => {
   };
 
   const handleDragOver: React.ComponentProps<typeof DragDropProvider>["onDragOver"] = ({ operation }) => {
-    const { source } = operation;
+    const { source, target } = operation;
     if (!isSortable(source) || source.type !== "component") return;
+
+    if (isSortable(target) && target.type === "component") {
+      const targetId = target.id as string;
+      const found = targetId.startsWith("empty-") ? null : findComponentById(sections, targetId);
+
+      if (found && isContainer(found.type)) {
+        if (collapsedComponents[found.id]) {
+          pendingExpandContainerRef.current = found.id;
+          setCollapsedComponents((prev) => ({ ...prev, [found.id]: false }));
+          return;
+        }
+        if (pendingExpandContainerRef.current === found.id) {
+          return;
+        }
+      }
+    }
+
+    pendingExpandContainerRef.current = null;
 
     const { group, index } = source as typeof source & { group: string };
     const [toSectionId, parentKey] = group.split("::");
@@ -82,6 +115,8 @@ const ComponentTree = () => {
             index={sectionIndex}
             isOpen={!collapsed[section.id]}
             onToggleCollapse={() => toggleCollapse(section.id)}
+            collapsedComponents={collapsedComponents}
+            setCollapsedComponents={setCollapsedComponents}
           />
         ))}
       </DragDropProvider>

@@ -56,14 +56,14 @@ to { opacity: 1; transform: translateY(0); }
 
       {/* NAV */}
       <header className="w-full bg-(--background-secondary)/50 backdrop-blur-sm fixed flex items-center justify-between px-6 py-5 md:px-12 z-1">
-        <span className="text-(--purple) font-bold tracking-tight [font-family:var(--font-departure-mono)]">
+        <span className="text-(--purple) font-bold tracking-tight font-departure-mono">
           Masi Maker
         </span>
         <div className="flex items-center gap-2">
           <ThemeToggleButton />
           <Link
             href="/auth/login"
-            className="bg-(--purple) rounded-lg border border-(--purple)/50 text-white text-[13px] font-medium [font-family:var(--font-departure-mono)] px-3 py-2 transition-transform hover:bg-(--purple)/80 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
+            className="bg-(--purple) rounded-lg border border-(--purple)/50 text-white text-[13px] font-medium font-departure-mono px-3 py-2 transition-transform hover:bg-(--purple)/80 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
           >
             Log in
           </Link>
@@ -73,11 +73,11 @@ to { opacity: 1; transform: translateY(0); }
       {/* HERO */}
       <section className="mt-16 mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-8 md:grid-cols-2 md:items-center md:px-12 md:pt-16">
         <div>
-          <span className="mm-block inline-block rounded-full border border-(--purple)/50 bg-(--purple)/90 px-3 py-1 text-xs text-white [font-family:var(--font-departure-mono)] [animation-delay:0.04s]">
+          <span className="mm-block inline-block rounded-full border border-(--purple)/50 bg-(--purple)/90 px-3 py-1 text-xs text-white font-departure-mono [animation-delay:0.04s]">
             your-page-name.masimaker.com
           </span>
 
-          <h1 className="mm-block mt-5 text-4xl font-bold leading-[1.05] tracking-tight [font-family:var(--font-departure-mono)] md:text-5xl [var(--purple)]">
+          <h1 className="mm-block mt-5 text-4xl font-bold leading-[1.05] tracking-tight font-departure-mono md:text-5xl [var(--purple)]">
             Your page, built in blocks.
           </h1>
 
@@ -89,13 +89,13 @@ to { opacity: 1; transform: translateY(0); }
           <div className="mm-block mt-8 flex flex-wrap gap-3 [animation-delay:0.16s]">
             <Link
               href="/auth/register"
-              className="rounded-lg bg-(--purple) px-5 py-3 font-semibold [font-family:var(--font-departure-mono)] text-white transition-transform hover:-translate-y-0.5 hover:bg-[#71129f]/80  focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
+              className="rounded-lg bg-(--purple) px-5 py-3 font-semibold font-departure-mono text-white transition-transform hover:-translate-y-0.5 hover:bg-[#71129f]/80  focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
             >
               Start creating
             </Link>
             <Link
               href="/dashboard"
-              className="rounded-lg border border-(--foreground)/50 px-5 py-3 text-foreground font-semibold [font-family:var(--font-departure-mono)] transition-colors hover:-translate-y-0.5 hover:bg-(--foreground)/20 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#5B4FE8]"
+              className="rounded-lg border border-(--foreground)/50 px-5 py-3 text-foreground font-semibold font-departure-mono transition-colors hover:-translate-y-0.5 hover:bg-(--foreground)/20 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#5B4FE8]"
             >
               I already have an account
             </Link>
@@ -108,7 +108,7 @@ to { opacity: 1; transform: translateY(0); }
             <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
             <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-            <span className="ml-2 text-[11px] text-[#171717] [font-family:var(--font-departure-mono)]">
+            <span className="ml-2 text-[11px] text-[#171717] font-departure-mono">
               life-clinic.masimaker.com
             </span>
           </div>
@@ -148,7 +148,7 @@ to { opacity: 1; transform: translateY(0); }
 
       {/* COMO FUNCIONA — hierarquia real do produto */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:px-12">
-        <h2 className="text-2xl font-bold tracking-tight [font-family:var(--font-departure-mono)] md:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight font-departure-mono md:text-3xl">
           How it works
         </h2>
         <p className="mt-2 max-w-lg text-foreground font-roboto font-semibold">
@@ -166,7 +166,7 @@ to { opacity: 1; transform: translateY(0); }
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-8">
                 <div>
-                  <h3 className={`font-semibold ${item.text} [font-family:var(--font-departure-mono)]`}>
+                  <h3 className={`font-semibold ${item.text} font-departure-mono`}>
                     {item.title}
                   </h3>
                   <p className="mt-1 max-w-lg text-sm text-foreground font-roboto font-semibold">{item.desc}</p>
@@ -179,7 +179,7 @@ to { opacity: 1; transform: translateY(0); }
 
       {/* TEMPLATES */}
       <section className="mx-auto max-w-6xl px-6 py-16 md:px-12">
-        <h2 className="text-2xl font-bold tracking-tight [font-family:var(--font-departure-mono)] md:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight font-departure-mono md:text-3xl">
           Start from a template
         </h2>
         <p className="mt-2 max-w-lg text-foreground font-roboto font-semibold">
@@ -195,7 +195,7 @@ to { opacity: 1; transform: translateY(0); }
               <div className={`h-16 rounded-lg ${t.tintSoft}`}>
                 <div className={`h-full w-1/3 rounded-l-lg ${t.tint}`} />
               </div>
-              <p className="mt-4 font-bold [font-family:var(--font-departure-mono)]">{t.label}</p>
+              <p className="mt-4 font-bold font-departure-mono">{t.label}</p>
             </div>
           ))}
         </div>
@@ -205,7 +205,7 @@ to { opacity: 1; transform: translateY(0); }
       <section className="mx-auto max-w-6xl px-6 py-16 md:px-12">
         <div className="flex flex-col items-start gap-6 rounded-2xl bg-(--background-secondary) px-6 py-10 md:flex-row md:items-center md:justify-between md:px-10">
           <div>
-            <h2 className="text-1xl font-bold tracking-tight text-foreground [font-family:var(--font-departure-mono)]">
+            <h2 className="text-1xl font-bold tracking-tight text-foreground font-departure-mono">
               Your page can be live today.
             </h2>
             <p className="mt-2 text-sm text-foreground font-roboto font-semibold">
@@ -215,13 +215,13 @@ to { opacity: 1; transform: translateY(0); }
           <div className="flex shrink-0 gap-3">
             <Link
               href="/dashboard"
-              className=" h-12 rounded-lg bg-(--purple) px-5 py-4 text-[10px] [font-family:var(--font-departure-mono)] font-semibold text-white transition-transform hover:bg-(--purple)/80 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
+              className=" h-12 rounded-lg bg-(--purple) px-5 py-4 text-[10px] font-departure-mono font-semibold text-white transition-transform hover:bg-(--purple)/80 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Create my page
             </Link>
             <Link
               href="/auth/login"
-              className="h-12 rounded-lg border border-(--foreground)/30 px-5 py-4 text-[10px] font-semibold [font-family:var(--font-departure-mono)] text-foreground focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white hover:bg-(--foreground)/20 transition-transform hover:-translate-y-0.5"
+              className="h-12 rounded-lg border border-(--foreground)/30 px-5 py-4 text-[10px] font-semibold font-departure-mono text-foreground focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white hover:bg-(--foreground)/20 transition-transform hover:-translate-y-0.5"
             >
               Log in
             </Link>
