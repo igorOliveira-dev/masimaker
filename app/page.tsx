@@ -56,14 +56,14 @@ to { opacity: 1; transform: translateY(0); }
 
       {/* NAV */}
       <header className="w-full bg-(--background-secondary)/50 backdrop-blur-sm fixed flex items-center justify-between px-6 py-5 md:px-12 z-1">
-        <span className="text-(--purple) font-bold tracking-tight font-departure-mono">
+        <span className="text-(--purple) font-bold text-2xl tracking-tight font-departure-mono">
           Masi Maker
         </span>
         <div className="flex items-center gap-2">
           <ThemeToggleButton />
           <Link
             href="/auth/login"
-            className="bg-(--purple) rounded-lg border border-(--purple)/50 text-white text-[13px] font-medium font-departure-mono px-3 py-2 transition-transform hover:bg-(--purple)/80 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
+            className="bg-(--purple) rounded-lg border border-(--purple)/50 text-white text-[15px] font-medium font-departure-mono px-3 py-2 transition-transform hover:bg-(--purple)/80 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-[#711b9f]"
           >
             Log in
           </Link>
@@ -73,11 +73,11 @@ to { opacity: 1; transform: translateY(0); }
       {/* HERO */}
       <section className="mt-16 mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-8 md:grid-cols-2 md:items-center md:px-12 md:pt-16">
         <div>
-          <span className="mm-block inline-block rounded-full border border-(--purple)/50 bg-(--purple)/90 px-3 py-1 text-xs text-white font-departure-mono [animation-delay:0.04s]">
+          <span className="mm-block inline-block rounded-full border border-(--purple)/50 bg-(--purple)/90 px-3 py-1 text-m text-white font-departure-mono [animation-delay:0.04s]">
             your-page-name.masimaker.com
           </span>
 
-          <h1 className="mm-block mt-5 text-4xl font-bold leading-[1.05] tracking-tight font-departure-mono md:text-5xl [var(--purple)]">
+          <h1 className="mm-block mt-5 text-5xl font-bold leading-[1.05] tracking-tight font-departure-mono md:text-5xl [var(--purple)]">
             Your page, built in blocks.
           </h1>
 
@@ -205,23 +205,23 @@ to { opacity: 1; transform: translateY(0); }
       <section className="mx-auto max-w-6xl px-6 py-16 md:px-12">
         <div className="flex flex-col items-start gap-6 rounded-2xl bg-(--background-secondary) px-6 py-10 md:flex-row md:items-center md:justify-between md:px-10">
           <div>
-            <h2 className="text-1xl font-bold tracking-tight text-foreground font-departure-mono">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground font-departure-mono">
               Your page can be live today.
             </h2>
-            <p className="mt-2 text-sm text-foreground font-roboto font-semibold">
+            <p className="mt-2 text-m text-foreground font-roboto font-semibold">
               No code, no hassle — just build and publish.
             </p>
           </div>
           <div className="flex shrink-0 gap-3">
             <Link
               href="/dashboard"
-              className=" h-12 rounded-lg bg-(--purple) px-5 py-4 text-[10px] font-departure-mono font-semibold text-white transition-transform hover:bg-(--purple)/80 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
+              className=" h-12 rounded-lg bg-(--purple) px-5 py-3 text-[15px] font-departure-mono font-semibold text-white transition-transform hover:bg-(--purple)/80 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Create my page
             </Link>
             <Link
               href="/auth/login"
-              className="h-12 rounded-lg border border-(--foreground)/30 px-5 py-4 text-[10px] font-semibold font-departure-mono text-foreground focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white hover:bg-(--foreground)/20 transition-transform hover:-translate-y-0.5"
+              className="h-12 rounded-lg border border-(--foreground)/30 px-5 py-3 text-[15px] font-semibold font-departure-mono text-foreground focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white hover:bg-(--foreground)/20 transition-transform hover:-translate-y-0.5"
             >
               Log in
             </Link>
