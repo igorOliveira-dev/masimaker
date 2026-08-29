@@ -54,7 +54,7 @@ const ImageInspector = ({ component, sectionId }: ImageInspectorProps) => {
                 attributes: { ...attributes, width: e.target.value },
               })
             }
-            className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
+            className="h-8 w-25 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
           />
         </label>
 
@@ -68,7 +68,7 @@ const ImageInspector = ({ component, sectionId }: ImageInspectorProps) => {
                 attributes: { ...attributes, height: e.target.value },
               })
             }
-            className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
+            className="h-8 w-25 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
           />
         </label>
       </div>
