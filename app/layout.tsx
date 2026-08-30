@@ -31,7 +31,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${roboto.variable} ${departureMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${roboto.variable} ${departureMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("theme");if(t!=="dark"&&t!=="light"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

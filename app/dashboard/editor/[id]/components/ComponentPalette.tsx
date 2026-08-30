@@ -4,12 +4,18 @@ import { componentList } from "../blocks/index";
 import { useEditorStore } from "@/app/stores/editorStore";
 
 const ComponentPalette = () => {
+  const sections = useEditorStore((s) => s.sections);
   const selectedSectionId = useEditorStore((s) => s.selectedSectionId);
+  const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const addComponent = useEditorStore((s) => s.addComponent);
 
   function handleAddComponent(def: (typeof componentList)[number]) {
     if (!selectedSectionId) return;
-    addComponent(def, selectedSectionId);
+    const selectedComponent = sections
+      .find((s) => s.id === selectedSectionId)
+      ?.components.find((c) => c.id === selectedComponentId);
+    const parentComponentId = selectedComponent?.type === "container" ? selectedComponent.id : null;
+    addComponent(def, selectedSectionId, parentComponentId);
   }
 
   return (
