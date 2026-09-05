@@ -10,6 +10,10 @@ export interface ComponentItem {
   attributes: Record<string, any>;
   position: number;
   parentComponentId: string | null;
+  x: number | null;
+  y: number | null;
+  width: number | null;
+  height: number | null;
 }
 
 export interface SectionItem {
@@ -68,6 +72,11 @@ interface EditorState {
   addComponent: (def: ComponentDefLike, sectionId: string, parentComponentId?: string | null) => void;
   removeComponent: (sectionId: string, componentId: string) => void;
   updateComponent: (sectionId: string, componentId: string, patch: Partial<ComponentItem>) => void;
+  updateComponentGeometry: (
+    sectionId: string,
+    componentId: string,
+    patch: Partial<Pick<ComponentItem, "x" | "y" | "width" | "height">>,
+  ) => void;
 
   selectedSectionId: string | null;
   selectedComponentId: string | null;
@@ -163,6 +172,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
         sections: state.sections.map((s) => {
           if (s.id !== sectionId) return s;
           const siblings = s.components.filter((c) => c.parentComponentId === parentComponentId);
+          const cascade = siblings.length % 8;
+          const isTopLevel = parentComponentId === null;
           return {
             ...s,
             components: [
@@ -174,6 +185,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
                 colors: structuredClone(def.defaultColors),
                 position: siblings.length,
                 parentComponentId,
+                x: isTopLevel ? 24 + cascade * 24 : null,
+                y: isTopLevel ? 24 + cascade * 24 : null,
+                width: null,
+                height: null,
               },
             ],
           };
@@ -242,6 +257,21 @@ export const useEditorStore = create<EditorState>((set, get) => {
         ),
         isDirty: true,
       })),
+
+    updateComponentGeometry: (sectionId, componentId, patch) => {
+      pushHistory();
+      set((state) => ({
+        sections: state.sections.map((s) =>
+          s.id !== sectionId
+            ? s
+            : {
+                ...s,
+                components: s.components.map((c) => (c.id !== componentId ? c : { ...c, ...patch })),
+              },
+        ),
+        isDirty: true,
+      }));
+    },
 
     reorderSections: (fromIndex, toIndex) => {
       if (fromIndex === toIndex) return;
@@ -429,6 +459,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   attributes: component.attributes,
                   position: component.position,
                   parent_component_id: resolvedParentComponentId,
+                  x: component.x,
+                  y: component.y,
+                  width: component.width,
+                  height: component.height,
                 })
                 .select("id")
                 .single();
@@ -444,6 +478,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   attributes: component.attributes,
                   position: component.position,
                   parent_component_id: resolvedParentComponentId,
+                  x: component.x,
+                  y: component.y,
+                  width: component.width,
+                  height: component.height,
                 })
                 .eq("id", component.id);
               resolvedComponents.push({ ...component, parentComponentId: resolvedParentComponentId });

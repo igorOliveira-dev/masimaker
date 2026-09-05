@@ -2,7 +2,7 @@ import { createClient } from "@/app/utils/supabase/server"; // versão server-si
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import type { ComponentItem } from "@/app/stores/editorStore";
-import { componentRegistry, isContainer } from "@/app/dashboard/editor/[id]/blocks";
+import SectionCanvas from "./SectionCanvas";
 
 interface SectionItem {
   id: string;
@@ -10,27 +10,6 @@ interface SectionItem {
   height: number | null;
   position: number;
   components: ComponentItem[];
-}
-
-function sortedChildren(components: ComponentItem[], parentId: string | null) {
-  return components.filter((c) => c.parentComponentId === parentId).sort((a, b) => a.position - b.position);
-}
-
-function RenderComponentTree({ component, allComponents }: { component: ComponentItem; allComponents: ComponentItem[] }) {
-  const def = componentRegistry[component.type as keyof typeof componentRegistry];
-  if (!def) return null;
-
-  const { Component } = def;
-
-  return (
-    <Component component={component}>
-      {isContainer(component.type)
-        ? sortedChildren(allComponents, component.id).map((child) => (
-            <RenderComponentTree key={child.id} component={child} allComponents={allComponents} />
-          ))
-        : null}
-    </Component>
-  );
 }
 
 export default async function PublicSitePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -52,7 +31,7 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
   const { data: sectionsData } = await supabase
     .from("sections")
     .select(
-      "id, background, height, position, components (id, type, colors, attributes, position, parent_component_id)",
+      "id, background, height, position, components (id, type, colors, attributes, position, parent_component_id, x, y, width, height)",
     )
     .eq("page_id", page.id)
     .order("position", { ascending: true });
@@ -68,20 +47,12 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
   return (
     <div className="w-full">
       {sections.map((section) => (
-        <div
+        <SectionCanvas
           key={section.id}
-          style={{
-            backgroundColor: section.background ?? undefined,
-            minHeight: section.height ? `${section.height}px` : undefined,
-          }}
-          className="w-full"
-        >
-          <div className="max-w-[1280px] mx-auto">
-            {sortedChildren(section.components, null).map((component) => (
-              <RenderComponentTree key={component.id} component={component} allComponents={section.components} />
-            ))}
-          </div>
-        </div>
+          background={section.background}
+          height={section.height}
+          components={section.components}
+        />
       ))}
     </div>
   );
