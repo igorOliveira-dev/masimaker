@@ -1,21 +1,19 @@
-import { Type, MousePointerClick, Image as ImageIcon, LayoutGrid } from "lucide-react";
+import { Type, MousePointerClick, Image as ImageIcon } from "lucide-react";
 import Text from "./Text";
 import TextInspector from "./TextInspector";
 import Button from "./Button";
 import ButtonInspector from "./ButtonInspector";
 import Image from "./Image";
 import ImageInspector from "./ImageInspector";
-import Container from "./Container";
-import ContainerInspector from "./ContainerInspector";
 import type { ComponentItem } from "@/app/stores/editorStore";
 
-export type ComponentType = "text" | "button" | "image" | "container";
+export type ComponentType = "text" | "button" | "image";
 
 export interface ComponentDefinition {
   type: ComponentType;
   label: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
-  Component: React.ComponentType<{ component: ComponentItem; children?: React.ReactNode }>;
+  Component: React.ComponentType<{ component: ComponentItem }>;
   Inspector?: React.ComponentType<{
     component: ComponentItem;
     sectionId: string;
@@ -69,25 +67,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     },
     defaultColors: {},
   },
-  container: {
-    type: "container",
-    label: "Container",
-    icon: LayoutGrid,
-    Component: Container,
-    Inspector: ContainerInspector,
-    defaultAttributes: {
-      direction: "column",
-      gap: 8,
-      align: "stretch",
-      justify: "start",
-      padding: 16,
-      borderRadius: 0,
-      minHeight: 60,
-    },
-    defaultColors: { background: "transparent" },
-  },
 };
 
 export const componentList = Object.values(componentRegistry);
-
-export const isContainer = (type: string) => type === "container";

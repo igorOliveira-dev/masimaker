@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditorStore } from "@/app/stores/editorStore";
 import type { ComponentItem } from "@/app/stores/editorStore";
-import { componentRegistry, isContainer } from "../blocks";
+import { componentRegistry } from "../blocks";
 import PreviewDeviceToggle from "./PreviewDeviceToggle";
 import CanvasItem from "./CanvasItem";
 import { CANVAS_REFERENCE_WIDTH } from "@/app/constants/canvas";
@@ -23,21 +23,17 @@ function sortedChildren(components: ComponentItem[], parentId: string | null) {
 function RenderedComponent({
   component,
   sectionId,
-  allComponents,
   selectedComponentId,
   selectComponent,
   fill = false,
 }: {
   component: ComponentItem;
   sectionId: string;
-  allComponents: ComponentItem[];
   selectedComponentId: string | null;
   selectComponent: (sectionId: string, componentId: string | null) => void;
   // true só pro item de topo do canvas quando ele tem width/height explícitos -
   // faz o conteúdo preencher a caixa redimensionada em vez de manter o tamanho
-  // natural do conteúdo. Nunca passado na recursão pros filhos de um container,
-  // que continuam se comportando exatamente como hoje (dimensionados pelo flex
-  // do container pai).
+  // natural do conteúdo.
   fill?: boolean;
 }) {
   const def = componentRegistry[component.type as keyof typeof componentRegistry];
@@ -59,20 +55,7 @@ function RenderedComponent({
       className={isSelected ? "relative z-10 outline-2 outline-blue-500 -outline-offset-2" : ""}
       style={fill ? { width: "100%", height: "100%" } : undefined}
     >
-      <Component component={component}>
-        {isContainer(component.type)
-          ? sortedChildren(allComponents, component.id).map((child) => (
-              <RenderedComponent
-                key={child.id}
-                component={child}
-                sectionId={sectionId}
-                allComponents={allComponents}
-                selectedComponentId={selectedComponentId}
-                selectComponent={selectComponent}
-              />
-            ))
-          : null}
-      </Component>
+      <Component component={component} />
     </div>
   );
 }
@@ -193,7 +176,6 @@ const PagePreview = () => {
                         <RenderedComponent
                           component={component}
                           sectionId={section.id}
-                          allComponents={section.components}
                           selectedComponentId={selectedComponentId}
                           selectComponent={selectComponent}
                           fill={component.width != null || component.height != null}

@@ -1,11 +1,10 @@
 "use client";
 
 import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { useEditorStore, type ComponentItem } from "@/app/stores/editorStore";
-import { componentRegistry, isContainer } from "../blocks";
+import { componentRegistry } from "../blocks";
 import ActionsMenu from "../../../components/ActionsMenu";
 import ConfirmModal from "../../../components/ConfirmModal";
 
@@ -19,19 +18,9 @@ type Props = {
   sectionId: string;
   parentComponentId: string | null;
   depth: number;
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
 };
 
-export function SortableComponent({
-  component,
-  index,
-  sectionId,
-  parentComponentId,
-  depth,
-  isCollapsed,
-  onToggleCollapse,
-}: Props) {
+export function SortableComponent({ component, index, sectionId, parentComponentId, depth }: Props) {
   const selectedComponentId = useEditorStore((s) => s.selectedComponentId);
   const selectComponent = useEditorStore((s) => s.selectComponent);
   const removeComponent = useEditorStore((s) => s.removeComponent);
@@ -54,7 +43,6 @@ export function SortableComponent({
 
   const def = componentRegistry[component.type as keyof typeof componentRegistry];
   const isSelected = selectedComponentId === component.id;
-  const container = isContainer(component.type);
 
   return (
     <div
@@ -68,17 +56,6 @@ export function SortableComponent({
         isSelected ? "bg-(--foreground)/15" : "hover:bg-(--foreground)/10"
       } ${isDragging ? "opacity-50" : ""}`}
     >
-      {container ? (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleCollapse();
-          }}
-          className="cursor-pointer flex items-center justify-center w-4 h-4 shrink-0"
-        >
-          {isCollapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
-        </button>
-      ) : null}
       {def?.icon ? <def.icon size={13} className="shrink-0 opacity-70" /> : null}
       <span className="text-xs truncate flex-1">{def?.label ?? component.type}</span>
       <div
@@ -102,40 +79,6 @@ export function SortableComponent({
         confirmLabel="Delete"
         danger
       />
-    </div>
-  );
-}
-
-export function EmptyContainerSlot({
-  sectionId,
-  parentComponentId,
-  depth,
-}: {
-  sectionId: string;
-  parentComponentId: string;
-  depth: number;
-}) {
-  // apenas um alvo de drop — nunca uma origem arrastável — pra que "Drop here" não
-  // possa ser reordenado na árvore e se desgrudar do seu container pai. Sem transição
-  // também: como ele é o único "filho" possível de um container vazio, não faz sentido
-  // animá-lo se afastando do container pra "abrir espaço" pra quem está sendo arrastado
-  const { ref } = useSortable({
-    id: `empty-${parentComponentId}`,
-    index: 0,
-    group: groupKey(sectionId, parentComponentId),
-    type: "component",
-    accept: "component",
-    disabled: { draggable: true },
-    transition: null,
-  });
-
-  return (
-    <div
-      ref={ref}
-      style={{ marginLeft: depth * 16 }}
-      className="text-xs text-(--foreground)/30 py-1 px-2 border border-dashed border-(--foreground)/10 rounded"
-    >
-      Drop here
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ComponentItem } from "@/app/stores/editorStore";
-import { componentRegistry, isContainer } from "@/app/dashboard/editor/[id]/blocks";
+import { componentRegistry } from "@/app/dashboard/editor/[id]/blocks";
 import { CANVAS_REFERENCE_WIDTH } from "@/app/constants/canvas";
 
 interface SectionCanvasProps {
@@ -15,21 +15,13 @@ function sortedChildren(components: ComponentItem[], parentId: string | null) {
   return components.filter((c) => c.parentComponentId === parentId).sort((a, b) => a.position - b.position);
 }
 
-function RenderComponentTree({ component, allComponents }: { component: ComponentItem; allComponents: ComponentItem[] }) {
+function RenderComponentTree({ component }: { component: ComponentItem }) {
   const def = componentRegistry[component.type as keyof typeof componentRegistry];
   if (!def) return null;
 
   const { Component } = def;
 
-  return (
-    <Component component={component}>
-      {isContainer(component.type)
-        ? sortedChildren(allComponents, component.id).map((child) => (
-            <RenderComponentTree key={child.id} component={child} allComponents={allComponents} />
-          ))
-        : null}
-    </Component>
-  );
+  return <Component component={component} />;
 }
 
 // espelha a mesma lógica de escala do preview do editor (PagePreview.tsx): mede a
@@ -83,10 +75,10 @@ export default function SectionCanvas({ background, height, components }: Sectio
             >
               {component.height != null ? (
                 <div style={{ height: "100%" }}>
-                  <RenderComponentTree component={component} allComponents={components} />
+                  <RenderComponentTree component={component} />
                 </div>
               ) : (
-                <RenderComponentTree component={component} allComponents={components} />
+                <RenderComponentTree component={component} />
               )}
             </div>
           ))}
