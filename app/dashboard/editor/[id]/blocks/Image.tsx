@@ -17,11 +17,22 @@ interface ImageProps {
 const Image = ({ component }: ImageProps) => {
   const { attributes } = component;
   const src = attributes?.src ?? "";
-  const width = toCssLength(attributes?.width, "100%");
-  const height = toCssLength(attributes?.height, "auto");
+  // quando redimensionado no canvas (component.width/height explícitos), a imagem
+  // preenche a caixa toda (100% x 100%) e o objectFit cuida do enquadramento - sem
+  // isso, height:"auto" (o padrão) ignora a altura da caixa redimensionada e mantém
+  // a proporção natural da imagem, que pode ultrapassar esse limite
+  const filled = component.width != null || component.height != null;
+  const width = filled ? "100%" : toCssLength(attributes?.width, "100%");
+  const height = filled ? "100%" : toCssLength(attributes?.height, "auto");
 
   return (
-    <div style={{ textAlign: attributes?.align ?? "left" }}>
+    <div
+      style={{
+        textAlign: attributes?.align ?? "left",
+        width: filled ? "100%" : undefined,
+        height: filled ? "100%" : undefined,
+      }}
+    >
       {src ? (
         <img
           src={src}
@@ -31,12 +42,12 @@ const Image = ({ component }: ImageProps) => {
             height,
             objectFit: attributes?.objectFit ?? "cover",
             borderRadius: attributes?.borderRadius ?? 0,
-            display: "inline-block",
+            display: filled ? "block" : "inline-block",
           }}
         />
       ) : (
         <div
-          className="inline-flex flex-col items-center justify-center gap-1 border border-dashed border-(--foreground)/20 text-(--foreground)/40 text-xs"
+          className="inline-flex flex-col items-center justify-center gap-1 border border-dashed border-black/20 text-black/40 text-md"
           style={{
             width,
             height: height === "auto" ? 120 : height,

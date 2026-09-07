@@ -123,7 +123,7 @@ const ButtonInspector = ({ component, sectionId }: ButtonInspectorProps) => {
       <label className="flex flex-col gap-1 text-xs">
         Align
         <select
-          value={attributes?.align ?? "left"}
+          value={attributes?.align ?? "center"}
           onChange={(e) =>
             updateComponent(sectionId, component.id, {
               attributes: { ...attributes, align: e.target.value },

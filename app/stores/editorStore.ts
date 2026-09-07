@@ -172,9 +172,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
     },
 
     updateSection: (sectionId, patch) => {
+      // height é coluna integer no banco - o resize da section divide o delta do
+      // mouse pela escala do preview (mobile/tablet), o que quase sempre gera um
+      // valor fracionário; sem arredondar aqui, o update no Supabase falha com um
+      // erro de tipo que passava batido (silenciosamente, sem persistir nada)
+      const roundedPatch = patch.height != null ? { ...patch, height: Math.round(patch.height) } : patch;
       pushHistory();
       set((state) => ({
-        sections: state.sections.map((s) => (s.id === sectionId ? { ...s, ...patch } : s)),
+        sections: state.sections.map((s) => (s.id === sectionId ? { ...s, ...roundedPatch } : s)),
         isDirty: true,
       }));
     },
@@ -274,6 +279,18 @@ export const useEditorStore = create<EditorState>((set, get) => {
       })),
 
     updateComponentGeometry: (sectionId, componentId, patch) => {
+      // x/y/width/height são colunas integer no banco - dividir o delta do mouse
+      // pela escala do preview (que quase nunca é exatamente 1, já que a largura
+      // do painel raramente bate certinho com CANVAS_REFERENCE_WIDTH) quase sempre
+      // gera um valor fracionário; sem arredondar aqui, o update no Supabase falha
+      // com um erro de tipo que passava batido (silenciosamente, sem persistir nada)
+      const roundedPatch = {
+        ...patch,
+        ...(patch.x != null && { x: Math.round(patch.x) }),
+        ...(patch.y != null && { y: Math.round(patch.y) }),
+        ...(patch.width != null && { width: Math.round(patch.width) }),
+        ...(patch.height != null && { height: Math.round(patch.height) }),
+      };
       pushHistory();
       set((state) => ({
         sections: state.sections.map((s) =>
@@ -281,7 +298,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
             ? s
             : {
                 ...s,
-                components: s.components.map((c) => (c.id !== componentId ? c : { ...c, ...patch })),
+                components: s.components.map((c) => (c.id !== componentId ? c : { ...c, ...roundedPatch })),
               },
         ),
         isDirty: true,
@@ -484,7 +501,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
         // 1. apagar sections removidas
         const sectionsToDelete = savedSections.filter((s) => !newSectionIds.has(s.id));
         for (const s of sectionsToDelete) {
-          await supabase.from("sections").delete().eq("id", s.id);
+          const { error } = await supabase.from("sections").delete().eq("id", s.id);
+          if (error) throw error;
         }
 
         // 2. inserir/atualizar sections + resolver ids temporários
@@ -510,7 +528,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
             if (error || !data) throw error;
             sectionId = data.id;
           } else {
-            await supabase
+            const { error } = await supabase
               .from("sections")
               .update({
                 name: section.name,
@@ -520,6 +538,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
                 position: section.position,
               })
               .eq("id", section.id);
+
+            if (error) throw error;
           }
 
           // 3. pastas dessa section — apagar removidas, inserir/atualizar as demais
@@ -530,7 +550,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
           const foldersToDelete = oldFolders.filter((f) => !newFolderIds.has(f.id));
           for (const f of foldersToDelete) {
-            await supabase.from("component_folders").delete().eq("id", f.id);
+            const { error } = await supabase.from("component_folders").delete().eq("id", f.id);
+            if (error) throw error;
           }
 
           // insere/atualiza pastas-pai antes das filhas, pra resolver parent_folder_id
@@ -562,7 +583,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
               folderIdMap.set(folder.id, data.id);
               resolvedFolders.push({ ...folder, id: data.id, parentFolderId: resolvedParentFolderId });
             } else {
-              await supabase
+              const { error } = await supabase
                 .from("component_folders")
                 .update({
                   name: folder.name,
@@ -570,6 +591,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   parent_folder_id: resolvedParentFolderId,
                 })
                 .eq("id", folder.id);
+
+              if (error) throw error;
               resolvedFolders.push({ ...folder, parentFolderId: resolvedParentFolderId });
             }
           }
@@ -580,7 +603,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
           const componentsToDelete = oldComponents.filter((c) => !newComponentIds.has(c.id));
           for (const c of componentsToDelete) {
-            await supabase.from("components").delete().eq("id", c.id);
+            const { error } = await supabase.from("components").delete().eq("id", c.id);
+            if (error) throw error;
           }
 
           // insere/atualiza pais antes de filhos, para que o parent_component_id de um
@@ -627,7 +651,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
                 folderId: resolvedFolderId,
               });
             } else {
-              await supabase
+              const { error } = await supabase
                 .from("components")
                 .update({
                   colors: component.colors,
@@ -641,6 +665,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   height: component.height,
                 })
                 .eq("id", component.id);
+
+              if (error) throw error;
               resolvedComponents.push({ ...component, parentComponentId: resolvedParentComponentId, folderId: resolvedFolderId });
             }
           }
