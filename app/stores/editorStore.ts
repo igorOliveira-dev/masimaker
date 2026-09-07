@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createClient } from "@/app/utils/supabase/client";
+import { childrenOf, positionBetween, reindexSection, subtreeOf } from "./tree";
 
 export type PreviewDevice = "mobile" | "tablet" | "desktop";
 
@@ -8,12 +9,29 @@ export interface ComponentItem {
   type: string;
   colors: Record<string, any>;
   attributes: Record<string, any>;
+  // ordem na árvore da section, num contador único compartilhado com as pastas e
+  // atribuído em profundidade (ver reindexSection). Como o canvas desenha só os
+  // componentes de topo ordenados por `position`, a ordem de empilhamento passa a
+  // ser exatamente a ordem que se vê na Structure — igual ao Photoshop.
   position: number;
   parentComponentId: string | null;
+  // pasta (grupo) que organiza esse componente na Structure, tipo grupo de camadas
+  // no Photoshop. Só se aplica a componentes de topo (parentComponentId === null).
+  folderId: string | null;
   x: number | null;
   y: number | null;
   width: number | null;
   height: number | null;
+}
+
+// pasta/grupo de organização na árvore de Structure, igual grupo de camadas no
+// Photoshop. Pode ser aninhada (parentFolderId) e agrupa componentes de topo de
+// uma section — não existe no canvas, é só organização visual da árvore.
+export interface FolderItem {
+  id: string;
+  name: string;
+  position: number;
+  parentFolderId: string | null;
 }
 
 export interface SectionItem {
@@ -23,6 +41,7 @@ export interface SectionItem {
   colors?: Record<string, any> | null;
   height?: number | null;
   position: number;
+  folders: FolderItem[];
   components: ComponentItem[];
 }
 
@@ -59,18 +78,19 @@ interface EditorState {
   setSections: (sections: SectionItem[]) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
   snapshotHistory: () => void;
-  moveComponentTo: (
-    componentId: string,
-    toSectionId: string,
-    toParentComponentId: string | null,
-    toIndex: number,
-  ) => void;
 
   addSection: (options?: { background?: string; height?: number }) => void; // na interface EditorState, adicione:
-  updateSection: (sectionId: string, patch: Partial<Omit<SectionItem, "id" | "components">>) => void;
+  updateSection: (sectionId: string, patch: Partial<Omit<SectionItem, "id" | "components" | "folders">>) => void;
   removeSection: (sectionId: string) => void;
   addComponent: (def: ComponentDefLike, sectionId: string, parentComponentId?: string | null) => void;
   removeComponent: (sectionId: string, componentId: string) => void;
+
+  addFolder: (sectionId: string, parentFolderId?: string | null) => void;
+  renameFolder: (sectionId: string, folderId: string, name: string) => void;
+  removeFolder: (sectionId: string, folderId: string, options?: { deleteContents?: boolean }) => void;
+  // move qualquer nó da árvore (pasta com tudo dentro, ou componente) pra outro ponto:
+  // outra section, outra pasta, outra posição entre irmãos
+  moveNode: (nodeId: string, toSectionId: string, toParentFolderId: string | null, toIndex: number) => void;
   updateComponent: (sectionId: string, componentId: string, patch: Partial<ComponentItem>) => void;
   updateComponentGeometry: (
     sectionId: string,
@@ -140,6 +160,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         colors: {},
         height: 300,
         position: sections.length,
+        folders: [],
         components: [],
       };
       set({
@@ -174,7 +195,8 @@ export const useEditorStore = create<EditorState>((set, get) => {
           const siblings = s.components.filter((c) => c.parentComponentId === parentComponentId);
           const cascade = siblings.length % 8;
           const isTopLevel = parentComponentId === null;
-          return {
+          const rootSiblings = childrenOf(s, null);
+          return reindexSection({
             ...s,
             components: [
               ...s.components,
@@ -183,15 +205,17 @@ export const useEditorStore = create<EditorState>((set, get) => {
                 type: def.type,
                 attributes: structuredClone(def.defaultAttributes),
                 colors: structuredClone(def.defaultColors),
-                position: siblings.length,
+                // entra no fim da raiz da section; o reindex normaliza pra inteiro
+                position: rootSiblings.length ? rootSiblings[rootSiblings.length - 1].position + 0.5 : 0,
                 parentComponentId,
+                folderId: null,
                 x: isTopLevel ? 24 + cascade * 24 : null,
                 y: isTopLevel ? 24 + cascade * 24 : null,
                 width: null,
                 height: null,
               },
             ],
-          };
+          });
         }),
         isDirty: true,
       }));
@@ -215,16 +239,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
             }
           }
 
-          const removed = s.components.find((c) => c.id === componentId);
-          const remaining = s.components.filter((c) => !idsToRemove.has(c.id));
-          const siblingScope = removed?.parentComponentId ?? null;
-
-          let siblingIndex = 0;
-          const components = remaining.map((c) =>
-            c.parentComponentId === siblingScope ? { ...c, position: siblingIndex++ } : c,
-          );
-
-          return { ...s, components };
+          return reindexSection({ ...s, components: s.components.filter((c) => !idsToRemove.has(c.id)) });
         }),
         isDirty: true,
       }));
@@ -291,63 +306,144 @@ export const useEditorStore = create<EditorState>((set, get) => {
       pushHistory();
     },
 
-    moveComponentTo: (componentId, toSectionId, toParentComponentId, toIndex) => {
+    addFolder: (sectionId, parentFolderId = null) => {
+      const { sections } = get();
+      const section = sections.find((s) => s.id === sectionId);
+      if (!section) return;
+
+      pushHistory();
+      const siblings = childrenOf(section, parentFolderId);
+      const newFolder: FolderItem = {
+        id: `temp-${crypto.randomUUID()}`,
+        name: "New folder",
+        parentFolderId,
+        // entra no fim do escopo; o reindex normaliza pra inteiro
+        position: siblings.length ? siblings[siblings.length - 1].position + 0.5 : 0,
+      };
+      set((state) => ({
+        sections: state.sections.map((s) =>
+          s.id === sectionId ? reindexSection({ ...s, folders: [...s.folders, newFolder] }) : s,
+        ),
+        isDirty: true,
+      }));
+    },
+
+    renameFolder: (sectionId, folderId, name) => {
+      pushHistory();
+      set((state) => ({
+        sections: state.sections.map((s) =>
+          s.id !== sectionId ? s : { ...s, folders: s.folders.map((f) => (f.id === folderId ? { ...f, name } : f)) },
+        ),
+        isDirty: true,
+      }));
+    },
+
+    removeFolder: (sectionId, folderId, options) => {
+      const deleteContents = options?.deleteContents ?? false;
+      pushHistory();
+      set((state) => ({
+        sections: state.sections.map((s) => {
+          if (s.id !== sectionId) return s;
+          const folder = s.folders.find((f) => f.id === folderId);
+          if (!folder) return s;
+
+          if (deleteContents) {
+            const { folderIds, componentIds } = subtreeOf(s, folderId);
+            return reindexSection({
+              ...s,
+              folders: s.folders.filter((f) => !folderIds.has(f.id)),
+              components: s.components.filter((c) => !componentIds.has(c.id)),
+            });
+          }
+
+          // "ungroup": só remove a pasta em si, promovendo os filhos diretos (subpastas
+          // e componentes) pro nível onde ela estava — a estrutura interna deles fica intacta
+          return reindexSection({
+            ...s,
+            folders: s.folders
+              .filter((f) => f.id !== folderId)
+              .map((f) => (f.parentFolderId === folderId ? { ...f, parentFolderId: folder.parentFolderId } : f)),
+            components: s.components.map((c) =>
+              c.folderId === folderId ? { ...c, folderId: folder.parentFolderId } : c,
+            ),
+          });
+        }),
+        isDirty: true,
+      }));
+    },
+
+    moveNode: (nodeId, toSectionId, toParentFolderId, toIndex) => {
       set((state) => {
-        const sections = state.sections.map((s) => ({ ...s, components: [...s.components] }));
+        const fromSection = state.sections.find(
+          (s) => s.folders.some((f) => f.id === nodeId) || s.components.some((c) => c.id === nodeId),
+        );
+        const toSection = state.sections.find((s) => s.id === toSectionId);
+        if (!fromSection || !toSection) return state;
+        if (toParentFolderId && !toSection.folders.some((f) => f.id === toParentFolderId)) return state;
 
-        let fromSection: SectionItem | undefined;
-        let fromIndex = -1;
-        for (const s of sections) {
-          const idx = s.components.findIndex((c) => c.id === componentId);
-          if (idx !== -1) {
-            fromSection = s;
-            fromIndex = idx;
-            break;
-          }
+        const folder = fromSection.folders.find((f) => f.id === nodeId);
+        const component = folder ? undefined : fromSection.components.find((c) => c.id === nodeId);
+        if (!folder && !component) return state;
+        // pastas organizam só componentes de topo
+        if (component && component.parentComponentId !== null) return state;
+
+        // o que viaja junto: uma pasta leva tudo que está dentro dela, em qualquer nível
+        const moving = folder
+          ? subtreeOf(fromSection, folder.id)
+          : { folderIds: new Set<string>(), componentIds: new Set([nodeId]) };
+
+        // não dá pra soltar uma pasta dentro dela mesma nem de uma descendente sua
+        if (toParentFolderId && moving.folderIds.has(toParentFolderId)) return state;
+
+        // posição fracionária entre os vizinhos do destino — o reindex em profundidade
+        // logo abaixo normaliza tudo de volta pra inteiros na ordem certa
+        const position = positionBetween(toSection, toParentFolderId, toIndex, nodeId);
+
+        const place = <T extends FolderItem | ComponentItem>(node: T): T =>
+          node.id !== nodeId
+            ? node
+            : "parentFolderId" in node
+              ? { ...node, parentFolderId: toParentFolderId, position }
+              : { ...node, folderId: toParentFolderId, position };
+
+        if (fromSection.id === toSection.id) {
+          return {
+            sections: state.sections.map((section) =>
+              section.id !== toSection.id
+                ? section
+                : reindexSection({
+                    ...section,
+                    folders: section.folders.map(place),
+                    components: section.components.map(place),
+                  }),
+            ),
+            isDirty: true,
+          };
         }
-        if (!fromSection) return state;
 
-        const toSection = sections.find((s) => s.id === toSectionId);
-        if (!toSection) return state;
+        const movedFolders = fromSection.folders.filter((f) => moving.folderIds.has(f.id)).map(place);
+        const movedComponents = fromSection.components.filter((c) => moving.componentIds.has(c.id)).map(place);
 
-        // impede que um componente seja solto dentro de si mesmo ou de um descendente seu
-        if (toParentComponentId) {
-          if (toParentComponentId === componentId) return state;
-          let ancestorId: string | null = toParentComponentId;
-          while (ancestorId) {
-            const ancestor = toSection.components.find((c) => c.id === ancestorId);
-            if (!ancestor) break;
-            if (ancestor.id === componentId) return state;
-            ancestorId = ancestor.parentComponentId;
-          }
-        }
-
-        const [moved] = fromSection.components.splice(fromIndex, 1);
-        const fromParentComponentId = moved.parentComponentId;
-        moved.parentComponentId = toParentComponentId;
-
-        const toSiblings = toSection.components.filter((c) => c.parentComponentId === toParentComponentId);
-        const clampedIndex = Math.max(0, Math.min(toIndex, toSiblings.length));
-
-        // encontra a posição real de inserção dentro do array completo da section,
-        // logo antes do sibling que hoje ocupa clampedIndex no escopo do pai alvo
-        const insertAt =
-          clampedIndex < toSiblings.length
-            ? toSection.components.indexOf(toSiblings[clampedIndex])
-            : toSection.components.length;
-        toSection.components.splice(insertAt, 0, moved);
-
-        const reindexScope = (section: SectionItem, parentId: string | null) => {
-          let i = 0;
-          section.components = section.components.map((c) =>
-            c.parentComponentId === parentId ? { ...c, position: i++ } : c,
-          );
+        return {
+          sections: state.sections.map((section) => {
+            if (section.id === fromSection.id) {
+              return reindexSection({
+                ...section,
+                folders: section.folders.filter((f) => !moving.folderIds.has(f.id)),
+                components: section.components.filter((c) => !moving.componentIds.has(c.id)),
+              });
+            }
+            if (section.id === toSection.id) {
+              return reindexSection({
+                ...section,
+                folders: [...section.folders, ...movedFolders],
+                components: [...section.components, ...movedComponents],
+              });
+            }
+            return section;
+          }),
+          isDirty: true,
         };
-
-        reindexScope(fromSection, fromParentComponentId);
-        reindexScope(toSection, toParentComponentId);
-
-        return { sections, isDirty: true };
       });
     },
 
@@ -426,8 +522,59 @@ export const useEditorStore = create<EditorState>((set, get) => {
               .eq("id", section.id);
           }
 
-          // 3. componentes dessa section
+          // 3. pastas dessa section — apagar removidas, inserir/atualizar as demais
+          //    resolvendo ids temporários antes dos componentes (que dependem de folder_id)
           const oldSection = savedSections.find((s) => s.id === section.id);
+          const oldFolders = oldSection?.folders ?? [];
+          const newFolderIds = new Set(section.folders.map((f) => f.id));
+
+          const foldersToDelete = oldFolders.filter((f) => !newFolderIds.has(f.id));
+          for (const f of foldersToDelete) {
+            await supabase.from("component_folders").delete().eq("id", f.id);
+          }
+
+          // insere/atualiza pastas-pai antes das filhas, pra resolver parent_folder_id
+          // de uma pasta com id temporário pro id real da pasta-pai
+          const orderedFolders = [...section.folders].sort((a, b) =>
+            a.parentFolderId === b.parentFolderId ? 0 : a.parentFolderId === null ? -1 : 1,
+          );
+
+          const folderIdMap = new Map<string, string>();
+          const resolvedFolders: FolderItem[] = [];
+          for (const folder of orderedFolders) {
+            const resolvedParentFolderId = folder.parentFolderId
+              ? (folderIdMap.get(folder.parentFolderId) ?? folder.parentFolderId)
+              : null;
+
+            if (isTempId(folder.id)) {
+              const { data, error } = await supabase
+                .from("component_folders")
+                .insert({
+                  section_id: sectionId,
+                  name: folder.name,
+                  position: folder.position,
+                  parent_folder_id: resolvedParentFolderId,
+                })
+                .select("id")
+                .single();
+
+              if (error || !data) throw error;
+              folderIdMap.set(folder.id, data.id);
+              resolvedFolders.push({ ...folder, id: data.id, parentFolderId: resolvedParentFolderId });
+            } else {
+              await supabase
+                .from("component_folders")
+                .update({
+                  name: folder.name,
+                  position: folder.position,
+                  parent_folder_id: resolvedParentFolderId,
+                })
+                .eq("id", folder.id);
+              resolvedFolders.push({ ...folder, parentFolderId: resolvedParentFolderId });
+            }
+          }
+
+          // 4. componentes dessa section
           const oldComponents = oldSection?.components ?? [];
           const newComponentIds = new Set(section.components.map((c) => c.id));
 
@@ -448,6 +595,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
             const resolvedParentComponentId = component.parentComponentId
               ? (parentIdMap.get(component.parentComponentId) ?? component.parentComponentId)
               : null;
+            const resolvedFolderId = component.folderId
+              ? (folderIdMap.get(component.folderId) ?? component.folderId)
+              : null;
 
             if (isTempId(component.id)) {
               const { data, error } = await supabase
@@ -459,6 +609,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   attributes: component.attributes,
                   position: component.position,
                   parent_component_id: resolvedParentComponentId,
+                  folder_id: resolvedFolderId,
                   x: component.x,
                   y: component.y,
                   width: component.width,
@@ -469,7 +620,12 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
               if (error || !data) throw error;
               parentIdMap.set(component.id, data.id);
-              resolvedComponents.push({ ...component, id: data.id, parentComponentId: resolvedParentComponentId });
+              resolvedComponents.push({
+                ...component,
+                id: data.id,
+                parentComponentId: resolvedParentComponentId,
+                folderId: resolvedFolderId,
+              });
             } else {
               await supabase
                 .from("components")
@@ -478,19 +634,21 @@ export const useEditorStore = create<EditorState>((set, get) => {
                   attributes: component.attributes,
                   position: component.position,
                   parent_component_id: resolvedParentComponentId,
+                  folder_id: resolvedFolderId,
                   x: component.x,
                   y: component.y,
                   width: component.width,
                   height: component.height,
                 })
                 .eq("id", component.id);
-              resolvedComponents.push({ ...component, parentComponentId: resolvedParentComponentId });
+              resolvedComponents.push({ ...component, parentComponentId: resolvedParentComponentId, folderId: resolvedFolderId });
             }
           }
 
           resolvedSections.push({
             ...section,
             id: sectionId,
+            folders: resolvedFolders,
             components: resolvedComponents,
           });
         }
