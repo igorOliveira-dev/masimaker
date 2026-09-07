@@ -8,7 +8,7 @@ import { useState } from "react";
 import EditorHeader from "./components/EditorHeader";
 import Toolbar from "./components/Toolbar";
 import { useEditorStore } from "@/app/stores/editorStore";
-import type { ComponentItem } from "@/app/stores/editorStore";
+import type { ComponentItem, FolderItem } from "@/app/stores/editorStore";
 import PagePreview from "./components/PagePreview";
 import Inspector from "./components/Inspector";
 
@@ -30,7 +30,9 @@ export default function EditorPage() {
     const { data: sectionsData, error: sectionsError } = await supabase
       .from("sections")
       .select(
-        "id, name, background, colors, height, position, components (id, type, colors, attributes, position, parent_component_id, x, y, width, height)",
+        "id, name, background, colors, height, position, " +
+          "component_folders (id, name, position, parent_folder_id), " +
+          "components (id, type, colors, attributes, position, parent_component_id, folder_id, x, y, width, height)",
       )
       .eq("page_id", pageId)
       .order("position", { ascending: true });
@@ -42,10 +44,19 @@ export default function EditorPage() {
 
     const sorted = (sectionsData ?? []).map((section: any) => ({
       ...section,
+      folders: [...(section.component_folders ?? [])]
+        .map((f): FolderItem => ({
+          id: f.id,
+          name: f.name,
+          position: f.position,
+          parentFolderId: f.parent_folder_id ?? null,
+        }))
+        .sort((a: FolderItem, b: FolderItem) => a.position - b.position),
       components: [...(section.components ?? [])]
         .map((c) => ({
           ...c,
           parentComponentId: c.parent_component_id ?? null,
+          folderId: c.folder_id ?? null,
         }))
         .sort((a: ComponentItem, b: ComponentItem) => a.position - b.position),
     }));

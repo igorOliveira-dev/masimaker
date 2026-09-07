@@ -36,11 +36,15 @@ export default async function PublicSitePage({ params }: { params: Promise<{ slu
     .eq("page_id", page.id)
     .order("position", { ascending: true });
 
+  // folders são só organização do editor (Structure panel) — não influenciam o
+  // canvas publicado, então nem são buscados aqui; folderId fica null pra bater
+  // com o tipo compartilhado ComponentItem.
   const sections: SectionItem[] = (sectionsData ?? []).map((section) => ({
     ...section,
     components: (section.components ?? []).map((c) => ({
       ...c,
       parentComponentId: c.parent_component_id ?? null,
+      folderId: null,
     })),
   }));
 
