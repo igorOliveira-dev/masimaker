@@ -1,7 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { Upload } from "lucide-react";
 import { useEditorStore } from "@/app/stores/editorStore";
 import type { ComponentItem } from "@/app/stores/editorStore";
+import { createClient } from "@/app/utils/supabase/client";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 interface ImageInspectorProps {
   component: ComponentItem;
@@ -11,6 +16,54 @@ interface ImageInspectorProps {
 const ImageInspector = ({ component, sectionId }: ImageInspectorProps) => {
   const updateComponent = useEditorStore((s) => s.updateComponent);
   const { attributes } = component;
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow selecting the same file again later
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please choose an image file.");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadError("Image must be smaller than 5MB.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadError(null);
+
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const extension = file.name.split(".").pop() || "png";
+    const path = `${user?.id ?? "anonymous"}/${crypto.randomUUID()}.${extension}`;
+
+    // "images" bucket must exist and be public in Supabase Storage
+    const { error: uploadErr } = await supabase.storage.from("images").upload(path, file);
+
+    if (uploadErr) {
+      setUploadError("Could not upload the image. Please try again.");
+      setUploading(false);
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("images").getPublicUrl(path);
+
+    updateComponent(sectionId, component.id, {
+      attributes: { ...attributes, src: publicUrl },
+    });
+    setUploading(false);
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,6 +81,27 @@ const ImageInspector = ({ component, sectionId }: ImageInspectorProps) => {
           className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm"
         />
       </label>
+
+      <div className="flex flex-col gap-1 text-xs">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={uploading}
+          className="hidden"
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="h-8 px-2 rounded border border-(--foreground)/10 bg-transparent text-sm flex items-center justify-center gap-1.5 cursor-pointer hover:bg-(--foreground)/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Upload size={14} />
+          {uploading ? "Uploading..." : "Upload from computer"}
+        </button>
+        {uploadError && <span className="text-red-600">{uploadError}</span>}
+      </div>
 
       <label className="flex flex-col gap-1 text-xs">
         Alt text
